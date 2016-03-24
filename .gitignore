@@ -1,0 +1,11 @@
+out
+.idea
+*.iml
+nbproject
+build.xml
+manifest.mf
+/ComboApp/build/
+*.classpath
+bin
+*.project
+/ComboApp/dist/
