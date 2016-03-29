@@ -9,3 +9,5 @@ manifest.mf
 bin
 *.project
 /ComboApp/dist/
+*.class
+log
