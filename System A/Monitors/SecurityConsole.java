@@ -3,7 +3,8 @@
  * Innopolis University
  * Date: 07.04.16
  */
-package Framework;
+package Monitors;
 
-public class Protocol {
+public class SecurityConsole {
+    private boolean armed = true;
 }
