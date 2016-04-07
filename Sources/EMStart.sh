@@ -1,4 +1,6 @@
 #javac *.java
+killall rmiregistry &
+sleep 1
 rmiregistry &
 java MessageManager
 
