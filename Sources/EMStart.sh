@@ -1,4 +1,4 @@
-#javac *.java
+javac *.java
 killall rmiregistry &
 sleep 1
 rmiregistry &
