@@ -81,7 +81,7 @@ public abstract class BaseSensor
     }
 
     // not all sensors will handle the messages
-    protected void handleMessages(Message msg){}
+    protected void handleMessage(Message msg){}
 
     private void handle()
     {
@@ -99,25 +99,19 @@ public abstract class BaseSensor
         while (!done) {
             try {
                 // Post the current measurement
-                postData ();
+                beforeHandle ();
 
                 // Get the message queue
                 eq = _em.GetMessageQueue();
 
                 // If there are messages in the queue, we read through them.
-                // We are looking for MessageIDs = -5, this means the the heater
-                // or chiller has been turned on/off. Note that we get all the messages
-                // at once... there is a 2.5 second delay between samples,.. so
-                // the assumption is that there should only be a message at most.
-                // If there are more, it is the last message that will effect the
-                // output of the temperature as it would in reality.
-                int qlen = eq.GetSize();
+                int qLen = eq.GetSize();
 
-                for ( int i = 0; i < qlen; i++ )
-                {
+                for ( int i = 0; i < qLen; i++ ) {
+
                     msg = eq.GetMessage();
 
-                    handleMessages(msg);
+                    handleMessage(msg);
 
                     // If the message ID == 99 then this is a signal that the simulation
                     // is to end. At this point, the loop termination flag is set to
@@ -128,6 +122,7 @@ public abstract class BaseSensor
                         _em.UnRegister();
                         _mw.WriteMessage("\n\nSimulation Stopped. \n");
                     }
+
                 }
 
                 afterHandle();
@@ -203,9 +198,9 @@ public abstract class BaseSensor
     protected void messageWindowAfterCreate() {}
 
     /**
-     * Send some data if needed
+     * Send some data if needed before message handling
      */
-    abstract protected void postData();
+    abstract protected void beforeHandle();
 
     /**
      * Do some after handle message processing

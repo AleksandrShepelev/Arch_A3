@@ -1,5 +1,5 @@
-/******************************************************************************************************************
-* File:HumidityController.java
+package Sensors; /******************************************************************************************************************
+* File:Sensors.HumidityController.java
 * Course: 17655
 * Project: Assignment A3
 * Copyright: Copyright (c) 2009 Carnegie Mellon University
@@ -32,7 +32,7 @@ import InstrumentationPackage.*;
 import MessagePackage.*;
 import java.util.*;
 
-class HumidityController
+public class HumidityController
 {
 	public static void main(String args[])
 	{

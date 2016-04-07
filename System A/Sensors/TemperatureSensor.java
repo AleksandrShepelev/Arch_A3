@@ -1,14 +1,16 @@
+package Sensors;
+
 import Framework.BaseSensor;
 import Framework.MessageProtocol;
 import MessagePackage.*;
 
-class TemperatureSensor extends BaseSensor
+public class TemperatureSensor extends BaseSensor
 {
     private float _currentTemperature = 50.0f;
     private float _driftValue;
 
-    boolean _heaterState = false;         // Heater state: false == off, true == on
-    boolean _chillerState = false;        // Chiller state: false == off, true == on
+    private boolean _heaterState = false;         // Heater state: false == off, true == on
+    private boolean _chillerState = false;        // Chiller state: false == off, true == on
 
     public static void main(String args[])
     {
@@ -54,31 +56,36 @@ class TemperatureSensor extends BaseSensor
         _mw.WriteMessage("   Drift Value Set:: " + _driftValue );
     }
 
-    @Override
-    protected void handleMessages(Message msg)
+    private void handleAdjustTemperature(Message msg)
     {
-        if (msg.GetMessageId() == MessageProtocol.Type.ADJUST_TEMPERATURE) {
-            switch (msg.GetMessage().toUpperCase()) {
-                case MessageProtocol.Body.HEATER_ON:
-                    _heaterState = true;
-                    break;
-                case MessageProtocol.Body.HEATER_OFF:
-                    _heaterState = false;
-                    break;
-                case MessageProtocol.Body.CHILLER_ON:
-                    _chillerState = true;
-                    break;
-                case MessageProtocol.Body.CHILLER_OFF:
-                    _chillerState = false;
-                    break;
-                default:
-                    break;
-            }
-        } // if
+        switch (msg.GetMessage().toUpperCase()) {
+            case MessageProtocol.Body.HEATER_ON:
+                _heaterState = true;
+                break;
+            case MessageProtocol.Body.HEATER_OFF:
+                _heaterState = false;
+                break;
+            case MessageProtocol.Body.CHILLER_ON:
+                _chillerState = true;
+                break;
+            case MessageProtocol.Body.CHILLER_OFF:
+                _chillerState = false;
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
-    protected void postData()
+    protected void handleMessage(Message msg)
+    {
+        if (msg.GetMessageId() == MessageProtocol.Type.ADJUST_TEMPERATURE) {
+            handleAdjustTemperature(msg);
+        }
+    }
+
+    @Override
+    protected void beforeHandle()
     {
         // Here we create the message.
         Message msg = new Message(MessageProtocol.Type.TEMPERATURE, String.valueOf(_currentTemperature));
@@ -100,15 +107,15 @@ class TemperatureSensor extends BaseSensor
         // heater/chiller controller.
         if (_heaterState) {
             _currentTemperature += getRandomNumber();
-        } // if heater is on
+        }
 
         if (!_heaterState && !_chillerState) {
             _currentTemperature += _driftValue;
-        } // if both the heater and chiller are off
+        }
 
         if (_chillerState) {
             _currentTemperature -= getRandomNumber();
-        } // if chiller is on
+        }
     }
 
-} // TemperatureSensor
+}

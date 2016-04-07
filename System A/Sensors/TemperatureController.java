@@ -1,5 +1,5 @@
-/******************************************************************************************************************
-* File:TemperatureController.java
+package Sensors; /******************************************************************************************************************
+* File:Sensors.TemperatureController.java
 * Course: 17655
 * Project: Assignment A3
 * Copyright: Copyright (c) 2009 Carnegie Mellon University
@@ -32,7 +32,7 @@ import InstrumentationPackage.*;
 import MessagePackage.*;
 import java.util.*;
 
-class TemperatureController
+public class TemperatureController
 {
 	public static void main(String args[])
 	{
@@ -336,4 +336,4 @@ class TemperatureController
 
 	} // PostMessage
 
-} // TemperatureController
+} // Sensors.TemperatureController

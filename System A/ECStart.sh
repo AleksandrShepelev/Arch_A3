@@ -4,14 +4,14 @@ echo "Starting ECS Sensors"
 sleep 1
 
 echo "Starting Temperature Controller Console"
-java TemperatureController &
+java Sensors.TemperatureController &
 sleep 1
 
 echo "Starting Humidity Sensor Console"
-java HumidityController &
+java Sensors.HumidityController &
 sleep 1
-java TemperatureSensor &
+java Sensors.TemperatureSensor &
 sleep 1
 
 echo "Starting Humidity Sensor Console"
-java HumiditySensor &
+java Sensors.HumiditySensor &
