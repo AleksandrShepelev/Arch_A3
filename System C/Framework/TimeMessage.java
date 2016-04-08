@@ -4,7 +4,7 @@ import MessagePackage.Message;
 
 public class TimeMessage {
 
-    static final String BODY_DELIMETER = "_";
+    public static final String BODY_DELIMETER = "_";
 
     private Message _msg;
 
