@@ -57,35 +57,12 @@ public class MessageProtocol
         public static final String SECURITY_ALARM_ON = "SC1"; // ...
         public static final String SECURITY_ALARM_OFF = "SC0"; // ...
 
-        public static final String ACK_SECURITY_ALARM_ON = "ASEC1";
-        public static final String ACK_SECURITY_ALARM_OFF = "ASEC0";
-
         public static final String WINDOW_BROKEN = "1"; // ...
         public static final String WINDOW_OK = "0"; // ...
         public static final String DOOR_BROKEN = "1"; // ...
         public static final String DOOR_OK = "0"; // ...
         public static final String MOTION_DETECTED = "1"; // ...
         public static final String MOTION_OK = "0"; // ...
-        //@TODO add messages for different sensors (F, T, H)
-        
-        public static final String ACK_HEATER_ON = "AH1";
-        public static final String ACK_HEATER_OFF = "AH0";
-
-        public static final String ACK_CHILLER_ON = "AC1";
-        public static final String ACK_CHILLER_OFF = "AC0";
-
-        public static final String ACK_DEHUMIDIFIER_ON = "AD1";
-        public static final String ACK_DEHUMIDIFIER_OFF = "AD0";
-
-        public static final String ACK_HUMIDIFIER_ON = "AHUM1";
-        public static final String ACK_HUMIDIFIER_OFF = "AHUM0";
-
-
-
-        public static final String ACK_SPRINKLER_ON = "AS1"; //..
-        //@TODO add messages for different ack.. (AS0, AWDM1, etc.)
-        
-        //@TODO add other controller messages
 
     }
 
