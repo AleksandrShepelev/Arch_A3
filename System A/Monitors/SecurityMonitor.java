@@ -2,8 +2,12 @@ package Monitors;
 
 import Framework.BaseMonitor;
 import Framework.MessageProtocol;
+import Framework.StoredMessage;
 import Framework.TimeMessage;
 import InstrumentationPackage.Indicator;
+import MessagePackage.Message;
+
+import java.util.HashMap;
 
 class SecurityMonitor extends BaseMonitor {
 
@@ -13,6 +17,7 @@ class SecurityMonitor extends BaseMonitor {
     private boolean _isWindowBroken;
     private boolean _isDoorBroken;
     private boolean _isMotionDetected;
+    private HashMap <Long, StoredMessage> _messageStorage = new HashMap<>();
 
     SecurityMonitor(String[] args) {
         super(args);
@@ -55,7 +60,15 @@ class SecurityMonitor extends BaseMonitor {
             case MessageProtocol.Type.MOTION:
                 handleMotion(msg);
                 break;
+            case MessageProtocol.Type.ACKNOWLEDGEMENT:
+                handleAcknowledgement(msg);
         }
+    }
+
+    private void handleAcknowledgement(TimeMessage msg) {
+        long key = Long.parseLong(msg.getMessageText());
+        _messageStorage.remove(key);
+
     }
 
     private void handleWindow(TimeMessage msg) {
@@ -91,10 +104,18 @@ class SecurityMonitor extends BaseMonitor {
     @Override
     protected void afterHandle() {
         sendAlarmState();
+        updateMessagesAge();
+    }
+
+    private void updateMessagesAge() {
+        _messageStorage.forEach((aLong, message) -> {
+            if(message.Age > 10){
+                sendMessage(new TimeMessage(message.Message));
+            }
+            message.incAge();});
     }
 
     private void sendAlarmState() {
-        TimeMessage msg;
         String body;
         boolean isSecured = !_isWindowBroken && !_isDoorBroken && !_isMotionDetected;
         boolean isAlarming = _armed && !isSecured;
@@ -103,7 +124,8 @@ class SecurityMonitor extends BaseMonitor {
         body = isAlarming
                 ? MessageProtocol.Body.SECURITY_ALARM_ON
                 : MessageProtocol.Body.SECURITY_ALARM_OFF;
-        msg = new TimeMessage(MessageProtocol.Type.SECURITY_ALARM, body);
+        Message origMsg = new Message(MessageProtocol.Type.SECURITY_ALARM, body);
+        TimeMessage timeMsg = new TimeMessage(origMsg);
         String displayMsg = !_armed
                                 ? "DISARMED"
                                 : isSecured
@@ -112,8 +134,14 @@ class SecurityMonitor extends BaseMonitor {
 
         _ai.SetLampColorAndMessage(displayMsg, 3);
 
+        sendMessage(timeMsg);
+
+        _messageStorage.put(timeMsg.getTimestamp(), new StoredMessage(origMsg));
+    }
+
+    private void sendMessage(TimeMessage timeMsg) {
         try {
-            _em.SendMessage(msg.getMessage());
+            _em.SendMessage(timeMsg.getMessage());
         } catch (Exception e) {
             System.out.println("Error sending Security alarm control message:: " + e);
         }
