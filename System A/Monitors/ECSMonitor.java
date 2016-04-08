@@ -7,8 +7,8 @@ package Monitors;
 
 import Framework.BaseMonitor;
 import Framework.MessageProtocol;
+import Framework.TimeMessage;
 import InstrumentationPackage.Indicator;
-import MessagePackage.Message;
 
 public class ECSMonitor extends BaseMonitor {
 
@@ -70,7 +70,7 @@ public class ECSMonitor extends BaseMonitor {
     }
 
     @Override
-    protected void handleMessage(Message msg) {
+    protected void handleMessage(TimeMessage msg) {
         if (msg.GetMessageId() == MessageProtocol.Type.TEMPERATURE) {
             handleTemperature(msg);
         }
@@ -79,17 +79,17 @@ public class ECSMonitor extends BaseMonitor {
         }
     }
 
-    private void handleTemperature(Message msg) {
+    private void handleTemperature(TimeMessage msg) {
         try {
-            _currentTemperature = Float.valueOf(msg.GetMessage());
+            _currentTemperature = Float.valueOf(msg.getMessageText());
         } catch (Exception e) {
             _mw.WriteMessage("Error reading temperature: " + e);
         } // catch
     }
 
-    private void handleHumidity(Message msg) {
+    private void handleHumidity(TimeMessage msg) {
         try {
-            _currentHumidity = Float.valueOf(msg.GetMessage());
+            _currentHumidity = Float.valueOf(msg.getMessageText());
         } catch (Exception e) {
             _mw.WriteMessage("Error reading humidity: " + e);
         } // catch
@@ -157,18 +157,18 @@ public class ECSMonitor extends BaseMonitor {
 
     private void heater(boolean ON) {
         // Here we create the message.
-        Message msg;
+        TimeMessage msg;
         String body;
         if (ON) {
             body = MessageProtocol.Body.HEATER_ON;
         } else {
             body = MessageProtocol.Body.HEATER_OFF;
         }
-        msg = new Message(MessageProtocol.Type.CONTROL_TEMPERATURE, body);
+        msg = new TimeMessage(MessageProtocol.Type.CONTROL_TEMPERATURE, body);
 
         // Here we send the message to the message manager.
         try {
-            _em.SendMessage(msg);
+            _em.SendMessage(msg.getMessage());
         } catch (Exception e) {
             System.out.println("Error sending heater control message:: " + e);
         }
@@ -176,18 +176,18 @@ public class ECSMonitor extends BaseMonitor {
 
     private void chiller(boolean ON) {
         // Here we create the message.
-        Message msg;
+        TimeMessage msg;
         String body;
         if (ON) {
             body = MessageProtocol.Body.CHILLER_ON;
         } else {
             body = MessageProtocol.Body.CHILLER_OFF;
         }
-        msg = new Message(MessageProtocol.Type.CONTROL_TEMPERATURE, body);
+        msg = new TimeMessage(MessageProtocol.Type.CONTROL_TEMPERATURE, body);
 
         // Here we send the message to the message manager.
         try {
-            _em.SendMessage(msg);
+            _em.SendMessage(msg.getMessage());
         } catch (Exception e) {
             System.out.println("Error sending chiller control message:: " + e);
         }
@@ -195,18 +195,18 @@ public class ECSMonitor extends BaseMonitor {
 
     private void humidifier(boolean ON) {
         // Here we create the message.
-        Message msg;
+        TimeMessage msg;
         String body;
         if (ON) {
             body = MessageProtocol.Body.HUMIDIFIER_ON;
         } else {
             body = MessageProtocol.Body.HUMIDIFIER_OFF;
         }
-        msg = new Message(MessageProtocol.Type.CONTROL_HUMIDITY, body);
+        msg = new TimeMessage(MessageProtocol.Type.CONTROL_HUMIDITY, body);
 
         // Here we send the message to the message manager.
         try {
-            _em.SendMessage(msg);
+            _em.SendMessage(msg.getMessage());
         } catch (Exception e) {
             System.out.println("Error sending humidifier control message:: " + e);
         }
@@ -214,18 +214,18 @@ public class ECSMonitor extends BaseMonitor {
 
     private void dehumidifier(boolean ON) {
         // Here we create the message.
-        Message msg;
+        TimeMessage msg;
         String body;
         if (ON) {
             body = MessageProtocol.Body.DEHUMIDIFIER_ON;
         } else {
             body = MessageProtocol.Body.DEHUMIDIFIER_OFF;
         }
-        msg = new Message(MessageProtocol.Type.CONTROL_HUMIDITY, body);
+        msg = new TimeMessage(MessageProtocol.Type.CONTROL_HUMIDITY, body);
 
         // Here we send the message to the message manager.
         try {
-            _em.SendMessage(msg);
+            _em.SendMessage(msg.getMessage());
         } catch (Exception e) {
             System.out.println("Error sending dehumidifier control message:: " + e);
         }
