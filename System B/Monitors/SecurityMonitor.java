@@ -97,7 +97,7 @@ class SecurityMonitor extends BaseMonitor {
         TimeMessage msg;
         String body;
         boolean isSecured = !_isWindowBroken && !_isDoorBroken && !_isMotionDetected;
-        boolean isAlarming = _armed && !isSecured;
+        boolean isAlarming = _armed && isSecured;
         _mw.WriteMessage(isAlarming ? "Turning on the alarm" : "Turning off the alarm");
 
         body = isAlarming
