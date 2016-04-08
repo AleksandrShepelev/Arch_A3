@@ -13,3 +13,7 @@ START "TEMPERATURE SENSOR CONSOLE" /MIN /NORMAL java Sensors.TemperatureSensor %
 START "HUMIDITY SENSOR CONSOLE" /MIN /NORMAL java Sensors.HumiditySensor %1
 %ECHO Starting Window Sensor Console
 START "WINDOW SENSOR CONSOLE" /MIN /NORMAL java Sensors.WindowSensor %1
+%ECHO Starting Door Sensor Console
+START "DOOR SENSOR CONSOLE" /MIN /NORMAL java Sensors.DoorSensor %1
+%ECHO Starting Motion Sensor Console
+START "MOTION SENSOR CONSOLE" /MIN /NORMAL java Sensors.MotionSensor %1
