@@ -10,7 +10,7 @@ import Framework.BaseConsole;
 public class SecurityConsole extends BaseConsole{
     private static final String ARM = "ON";
     private static final String DISARM = "OFF";
-    private boolean _armed = true;
+    private SecurityMonitor monitor;
 
 
     @Override
@@ -27,23 +27,22 @@ public class SecurityConsole extends BaseConsole{
 
     public void handleSecurityState()
     {
-        _armed = getNewStateFromUser();
-        SecurityMonitor monitor = (SecurityMonitor) _monitor;
-        monitor.setArmedState(_armed);
+        monitor = (SecurityMonitor) _monitor;
+        monitor.setArmedState(getNewStateFromUser(monitor.isArmed()));
     }
 
-    private boolean getNewStateFromUser() {
+    private boolean getNewStateFromUser(Boolean isArmed) {
         System.out.println("Enter 'OFF' to arm the system");
 
         String option;
         String expectedInput;
         while (true) {
-            expectedInput = _armed ? ARM : DISARM;
+            expectedInput = isArmed ? ARM : DISARM;
             System.out.println("Enter '" + expectedInput + "' to arm the system");
             option = _input.KeyboardReadString();
 
             if(option.equals(expectedInput)){
-                return !_armed;
+                return !isArmed;
             }
             System.out.println("Unexpected input, expected: " +
                     expectedInput + ", please try again...");
@@ -73,7 +72,7 @@ public class SecurityConsole extends BaseConsole{
 
     private String getArmedStateAsString()
     {
-        return _armed ? "ARMED" : "DISARMED";
+        return monitor.isArmed() ? "ARMED" : "DISARMED";
     }
 
 }
