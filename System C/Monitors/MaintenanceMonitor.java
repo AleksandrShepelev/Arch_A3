@@ -20,10 +20,20 @@ public class MaintenanceMonitor extends BaseMonitor {
     private Map<Long, String> _devices = new HashMap<>();
     private Map<Long, Long> _devicesAlive = new HashMap<>();
 
+    private int _regRequestsCounter = 0;
     private MaintenanceIndicator _mi;
 
     private MaintenanceMonitor(String[] args) {
         super(args);
+    }
+
+    private void sendRegisterRequest() {
+        try {
+            TimeMessage msg = new TimeMessage(MessageProtocol.Type.REGISTER_DEVICE_REQUEST, "");
+            _em.SendMessage(msg.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
@@ -123,6 +133,13 @@ public class MaintenanceMonitor extends BaseMonitor {
         }
 
         _mi.setRows(rows);
+
+        // if we are empty somehow and retry count is not fulfilled then register anyone
+        if (_regRequestsCounter < RETRY_COUNT && _devices.size() < 1) {
+            // push everyone to be registered
+            sendRegisterRequest();
+            _regRequestsCounter++;
+        }
 
     }
 }

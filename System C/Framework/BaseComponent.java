@@ -13,10 +13,11 @@ import MessagePackage.MessageQueue;
 abstract class BaseComponent {
 
     private static final int SLEEP_DELAY = 2500;    // The loop delay (2.5 seconds)
-    private static final int RETRY_COUNT = 10;       // Number of retries for acknowledged delivery
+    public static final int RETRY_COUNT = 10;       // Number of retries for acknowledged delivery
 
     private boolean _registered = true;             // Signifies that this class is registered with an message manager.
-    boolean _signed = false;                // Signifies that this class is registered in the maintenance monitor
+    private boolean _signed = false;                // Signifies that this class is registered in the maintenance monitor
+    boolean _canSign = true;                        // Sets if the component can register or not in the monitor
 
     protected MessageManagerInterface _em = null;   // Interface object to the message manager
     protected MessageWindow _mw = null;
@@ -45,6 +46,10 @@ abstract class BaseComponent {
 
     private boolean isSigned() {
         return _signed;
+    }
+
+    private boolean canSign() {
+        return _canSign;
     }
 
     private void parseArguments(String args[]) {
@@ -121,6 +126,15 @@ abstract class BaseComponent {
         }
     }
 
+    private boolean checkSignUpRequest(TimeMessage msg) {
+        if (msg.GetMessageId() == MessageProtocol.Type.REGISTER_DEVICE_REQUEST) {
+            _signed = false;
+            _mw.WriteMessage("Registration request accepted");
+            return true;
+        }
+        return false;
+    }
+
     private void handle() {
         Message msg;                // Message object
         TimeMessage timeMessage;
@@ -139,7 +153,7 @@ abstract class BaseComponent {
             try {
 
                 // try sign up in the maintenance monitor
-                if (!isSigned() && signCounter < getRetryCount()) {
+                if (canSign() && !isSigned() && signCounter < getRetryCount()) {
                     signUp();
                     signCounter++;
                 }
@@ -160,8 +174,14 @@ abstract class BaseComponent {
                     timeMessage = new TimeMessage(msg);
 
                     // check if the device is signed up
-                    if (!isSigned() && signCounter < getRetryCount()) {
+                    if (canSign() && !isSigned() && signCounter < getRetryCount()) {
                         checkSignUp(timeMessage);
+                    }
+
+                    // check if there is a register request from the monitor
+                    // reset the counter as well
+                    if (canSign() && checkSignUpRequest(timeMessage)) {
+                        signCounter = 0;
                     }
 
                     // handle other messages
