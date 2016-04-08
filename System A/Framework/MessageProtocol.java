@@ -60,6 +60,18 @@ public class MessageProtocol
         public static final String ACK_SECURITY_ALARM_ON = "ASEC1";
         public static final String ACK_SECURITY_ALARM_OFF = "ASEC0";
 
+        public static final String ACK_HEATER_ON = "AH1";
+        public static final String ACK_HEATER_OFF = "AH0";
+
+        public static final String ACK_CHILLER_ON = "AC1";
+        public static final String ACK_CHILLER_OFF = "AC0";
+
+        public static final String ACK_DEHUMIDIFIER_ON = "AD1";
+        public static final String ACK_DEHUMIDIFIER_OFF = "AD0";
+
+        public static final String ACK_HUMIDIFIER_ON = "AHUM1";
+        public static final String ACK_HUMIDIFIER_OFF = "AHUM0";
+
         //@TODO add messages for different sensors (D, M, F, T, H)
 
 

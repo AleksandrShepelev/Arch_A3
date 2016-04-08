@@ -14,7 +14,7 @@ public class TemperatureController extends BaseController
     private boolean _chillerState = false;
 
     protected TemperatureController(String[] args) {
-        super(args);
+        super(args, MessageProtocol.Type.CONTROL_TEMPERATURE);
     }
 
     @Override
@@ -66,37 +66,30 @@ public class TemperatureController extends BaseController
         return 0.3f;
     }
 
-    private void handleControlTemperature(TimeMessage msg)
+    @Override
+    protected String handleDeviceOutput(TimeMessage msg)
     {
         switch (msg.getMessageText().toUpperCase()) {
             case MessageProtocol.Body.HEATER_ON:
                 _heaterState = true;
                 _mw.WriteMessage("Received heater on message" );
-                break;
+                return MessageProtocol.Body.ACK_HEATER_ON;
             case MessageProtocol.Body.HEATER_OFF:
                 _heaterState = false;
                 _mw.WriteMessage("Received heater off message" );
-                break;
+                return MessageProtocol.Body.ACK_HEATER_OFF;
             case MessageProtocol.Body.CHILLER_ON:
                 _chillerState = true;
                 _mw.WriteMessage("Received chiller on message" );
-                break;
+                return MessageProtocol.Body.ACK_CHILLER_ON;
             case MessageProtocol.Body.CHILLER_OFF:
                 _chillerState = false;
                 _mw.WriteMessage("Received chiller off message" );
-                break;
+                return MessageProtocol.Body.ACK_CHILLER_OFF;
             default:
-                break;
         }
         adjustTemperature(msg.getMessageText().toUpperCase());
-    }
-
-    @Override
-    protected void handleMessage(TimeMessage msg)
-    {
-        if (msg.GetMessageId() == MessageProtocol.Type.CONTROL_TEMPERATURE) {
-            handleControlTemperature(msg);
-        }
+        return null;
     }
 
     private void handleHeaterState()
