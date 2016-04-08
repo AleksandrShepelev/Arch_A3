@@ -73,23 +73,25 @@ public class TemperatureController extends BaseController
             case MessageProtocol.Body.HEATER_ON:
                 _heaterState = true;
                 _mw.WriteMessage("Received heater on message" );
-                return MessageProtocol.Body.ACK_HEATER_ON;
+                break;
             case MessageProtocol.Body.HEATER_OFF:
                 _heaterState = false;
                 _mw.WriteMessage("Received heater off message" );
-                return MessageProtocol.Body.ACK_HEATER_OFF;
+                break;
             case MessageProtocol.Body.CHILLER_ON:
                 _chillerState = true;
                 _mw.WriteMessage("Received chiller on message" );
-                return MessageProtocol.Body.ACK_CHILLER_ON;
+                break;
             case MessageProtocol.Body.CHILLER_OFF:
                 _chillerState = false;
                 _mw.WriteMessage("Received chiller off message" );
-                return MessageProtocol.Body.ACK_CHILLER_OFF;
+                break;
             default:
+                _mw.WriteMessage("Unknown message: " + msg.getMessageText());
+                break;
         }
         adjustTemperature(msg.getMessageText().toUpperCase());
-        return null;
+        return String.valueOf(msg.getTimestamp());
     }
 
     private void handleHeaterState()

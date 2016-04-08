@@ -44,15 +44,16 @@ public class SecurityController extends BaseController{
             case MessageProtocol.Body.SECURITY_ALARM_ON:
                 _securityAlarmState = true;
                 _mw.WriteMessage("Security alarm is turned on!");
-                return MessageProtocol.Body.ACK_SECURITY_ALARM_ON;
+                break;
             case MessageProtocol.Body.SECURITY_ALARM_OFF:
                 _securityAlarmState = false;
                 _mw.WriteMessage("Security alarm is turned off!");
-                return MessageProtocol.Body.ACK_SECURITY_ALARM_OFF;
+                break;
             default:
                 _mw.WriteMessage("Unexpected message body in Security Controller: " + msgBody);
-                return null;
+                break;
         }
+        return String.valueOf(msg.getTimestamp());
     }
 
     @Override
