@@ -10,13 +10,13 @@ import MessagePackage.Message;
 import MessagePackage.MessageManagerInterface;
 import MessagePackage.MessageQueue;
 
-abstract class BaseConnector
+abstract class BaseComponent
 {
     private static final int SLEEP_DELAY = 2500;    // The loop delay (2.5 seconds)
     protected MessageManagerInterface _em = null;   // Interface object to the message manager
     protected MessageWindow _mw = null;
 
-    BaseConnector(String args[])
+    BaseComponent(String args[])
     {
         parseArguments(args);
     }

@@ -98,10 +98,8 @@ public class TemperatureController extends BaseController
         }
     }
 
-    @Override
-    protected void afterHandle() {
-        // Now we trend the temperature according to the status of the
-        // heater/chiller controller.
+    private void handleHeaterState()
+    {
         if (_heaterState) {
             // Set to green, heater is on
             _hi.SetLampColorAndMessage("HEATER ON", 1);
@@ -109,7 +107,10 @@ public class TemperatureController extends BaseController
             // Set to black, heater is off
             _hi.SetLampColorAndMessage("HEATER OFF", 0);
         }
+    }
 
+    private void handleChillerState()
+    {
         if (_chillerState) {
             // Set to green, chiller is on
             _ci.SetLampColorAndMessage("CHILLER ON", 1);
@@ -117,6 +118,12 @@ public class TemperatureController extends BaseController
             // Set to black, chiller is off
             _ci.SetLampColorAndMessage("CHILLER OFF", 0);
         }
+    }
+
+    @Override
+    protected void afterHandle() {
+        handleHeaterState();
+        handleChillerState();
     }
 
 }

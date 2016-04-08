@@ -91,10 +91,7 @@ public class HumidityController extends BaseController {
         }
     }
 
-    @Override
-    protected void afterHandle() {
-        // Now we trend the temperature according to the status of the
-        // heater/chiller controller.
+    private void handleHumidifierState() {
         if (_humidifierState) {
             // Set to green, heater is on
             _hi.SetLampColorAndMessage("HUMID ON", 1);
@@ -102,7 +99,9 @@ public class HumidityController extends BaseController {
             // Set to black, heater is off
             _hi.SetLampColorAndMessage("HUMID OFF", 0);
         }
+    }
 
+    private void handleDehumidifierState() {
         if (_dehumidifierState) {
             // Set to green, chiller is on
             _di.SetLampColorAndMessage("DEHUMID ON", 1);
@@ -110,6 +109,12 @@ public class HumidityController extends BaseController {
             // Set to black, chiller is off
             _di.SetLampColorAndMessage("DEHUMID OFF", 0);
         }
+    }
+
+    @Override
+    protected void afterHandle() {
+        handleHumidifierState();
+        handleDehumidifierState();
     }
 
 } // HumidityControllers

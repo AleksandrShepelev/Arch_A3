@@ -2,7 +2,7 @@ package Framework;
 
 import java.util.Random;
 
-public abstract class BaseSensor extends BaseConnector
+public abstract class BaseSensor extends BaseComponent
 {
     private static final Random _random = new Random();
 
