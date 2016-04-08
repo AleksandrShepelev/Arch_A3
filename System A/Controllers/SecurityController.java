@@ -27,7 +27,7 @@ public class SecurityController extends BaseController{
     protected void messageWindowAfterCreate()
     {
         // Put the status indicators under the panel...
-        _ai = new Indicator(INDICATOR_ALARM_OFF_MSG, _mw.GetX(), _mw.GetY()+_mw.Height());
+        _ai = new Indicator(INDICATOR_ALARM_OFF_MSG, _mw.GetX(), _mw.GetY()+_mw.Height(),0);
     }
 
     @Override
@@ -82,7 +82,7 @@ public class SecurityController extends BaseController{
     {
         if (_securityAlarmState) {
             // Set to green, chiller is on
-            _ai.SetLampColorAndMessage(INDICATOR_ALARM_ON_MSG, 1);
+            _ai.SetLampColorAndMessage(INDICATOR_ALARM_ON_MSG, 3);
         } else {
             // Set to black, chiller is off
             _ai.SetLampColorAndMessage(INDICATOR_ALARM_OFF_MSG, 0);

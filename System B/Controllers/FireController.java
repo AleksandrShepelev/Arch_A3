@@ -76,7 +76,7 @@ public class FireController extends BaseController {
     {
         if (_fireAlarmState) {
             // Set to green, chiller is on
-            _fi.SetLampColorAndMessage(INDICATOR_ALARM_ON_MSG, 1);
+            _fi.SetLampColorAndMessage(INDICATOR_ALARM_ON_MSG, 3);
         } else {
             // Set to black, chiller is off
             _fi.SetLampColorAndMessage(INDICATOR_ALARM_OFF_MSG, 0);
