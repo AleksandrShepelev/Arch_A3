@@ -124,8 +124,9 @@ class SecurityMonitor extends BaseMonitor {
         body = isAlarming
                 ? MessageProtocol.Body.SECURITY_ALARM_ON
                 : MessageProtocol.Body.SECURITY_ALARM_OFF;
-        Message origMsg = new Message(MessageProtocol.Type.SECURITY_ALARM, body);
-        TimeMessage timeMsg = new TimeMessage(origMsg);
+
+        TimeMessage timeMsg = new TimeMessage(MessageProtocol.Type.SECURITY_ALARM, body);
+
         String displayMsg = !_armed
                                 ? "DISARMED"
                                 : isSecured
@@ -136,7 +137,7 @@ class SecurityMonitor extends BaseMonitor {
 
         sendMessage(timeMsg);
 
-        _messageStorage.put(timeMsg.getTimestamp(), new StoredMessage(origMsg));
+        _messageStorage.put(timeMsg.getTimestamp(), new StoredMessage(timeMsg.getMessage()));
     }
 
     private void sendMessage(TimeMessage timeMsg) {
