@@ -8,20 +8,25 @@ import java.awt.*;
 public class MaintenanceIndicator extends JFrame {
 
     private JTable _table;
+    private static final int OFFLINE_CRITICAL_TIMEOUT = 5; // how many seconds is the critical maximum for devices to be offline
+
+    public static final Object columnNames[] = {
+        "Device ID",
+        "Device Type",
+        "Device Name",
+        "Last online"
+    };
 
     public MaintenanceIndicator() {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setBackground(Color.lightGray);
 
         Object rowData[][] = {};
-        Object columnNames[] = {
-            "Device ID",
-            "Device Type",
-            "Device Name",
-            "Last online"
-        };
 
         _table = new JTable(new DefaultTableModel(rowData, columnNames));
+        //_table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        _table.getColumnModel().getColumn(1).setPreferredWidth(50);
+        _table.getColumnModel().getColumn(2).setPreferredWidth(250);
         _table.setDefaultRenderer(Object.class, new MyCellRenderer());
 
         JScrollPane scrollPane = new JScrollPane(_table);
@@ -59,10 +64,10 @@ public class MaintenanceIndicator extends JFrame {
                     table, value, isSelected,
                     hasFocus, row, column);
 
-            Object val = table.getValueAt(row, 3);
+            Object val = table.getValueAt(row, columnNames.length - 1);
             String columnValue = val.toString();
             float lastOnline = Float.parseFloat(columnValue);
-            if (lastOnline > 5) {
+            if (lastOnline > OFFLINE_CRITICAL_TIMEOUT) {
                 setBackground(Color.red);
             } else {
                 setBackground(Color.green);
