@@ -12,8 +12,8 @@ public class MaintenanceIndicator extends JFrame {
 
     public static final Object columnNames[] = {
         "Device ID",
-        "Device Type",
         "Device Name",
+        "Device Description",
         "Last online"
     };
 
@@ -24,9 +24,8 @@ public class MaintenanceIndicator extends JFrame {
         Object rowData[][] = {};
 
         _table = new JTable(new DefaultTableModel(rowData, columnNames));
-        //_table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        _table.getColumnModel().getColumn(1).setPreferredWidth(50);
-        _table.getColumnModel().getColumn(2).setPreferredWidth(250);
+        _table.getColumnModel().getColumn(1).setPreferredWidth(50); // device name
+        _table.getColumnModel().getColumn(2).setPreferredWidth(250); // device description
         _table.setDefaultRenderer(Object.class, new MyCellRenderer());
 
         JScrollPane scrollPane = new JScrollPane(_table);
