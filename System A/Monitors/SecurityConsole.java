@@ -18,14 +18,14 @@ public class SecurityConsole extends BaseConsole{
         _monitor = new SecurityMonitor(args);
     }
 
-    public void main(String args[])
+    public static void main(String args[])
     {
         SecurityConsole console = new SecurityConsole();
         console.initMonitor(args);
         console.execute();
     }
 
-    public void handleSecurityState()
+    private void handleSecurityState()
     {
         monitor = (SecurityMonitor) _monitor;
         monitor.setArmedState(getNewStateFromUser(monitor.isArmed()));

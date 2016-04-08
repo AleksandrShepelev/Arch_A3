@@ -4,7 +4,7 @@ import MessagePackage.Message;
 
 public class TimeMessage {
 
-    public static final String BODY_DELIMETER = "_";
+    private static final String BODY_DELIMETER = "_";
 
     private Message _msg;
 
@@ -37,15 +37,20 @@ public class TimeMessage {
 
     public TimeMessage(int MsgId, String Text) {
         _timestamp = System.currentTimeMillis();
-        _msg = new Message(MsgId, String.valueOf(_timestamp)+BODY_DELIMETER+Text);
+        _msg = new Message(MsgId, String.valueOf(_timestamp) + BODY_DELIMETER + Text);
     }
 
     public TimeMessage(Message msg) {
         _msg = msg;
         String body = msg.GetMessage();
         String[] parts = body.split(BODY_DELIMETER);
-        System.out.println(parts[0]);
-        System.out.println(parts[1]);
+
+        //if it is a regular message just write it to the body
+        if (parts.length < 2) {
+            setMessageText(body);
+            return;
+        }
+
         try {
             long ts = Long.parseLong(parts[0]);
             setMessageText(parts[1]);
