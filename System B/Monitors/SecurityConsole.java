@@ -11,6 +11,9 @@ public class SecurityConsole extends BaseConsole {
 
     private static final String ARM = "ON";
     private static final String DISARM = "OFF";
+    private static final String CONFIRM = "Y";
+    private static final String CANCEL = "N";
+
 
     @Override
     protected void initMonitor(String[] args) {
@@ -40,10 +43,23 @@ public class SecurityConsole extends BaseConsole {
         }
     }
 
+    private boolean getSprinklerStateFromUser(String option) {
+        if (option.equals(CONFIRM))
+            return true;
+        else
+            return false;
+    }
+
+
     @Override
     protected void handleUserInput(String option) {
         SecurityMonitor monitor = (SecurityMonitor)_monitor;
-        monitor.setArmedState(getNewStateFromUser(monitor.isArmed(), option));
+
+        if (option.equals(ARM) || option.equals(DISARM))
+            monitor.setArmedState(getNewStateFromUser(monitor.isArmed(), option));
+
+        if (option.equals(CONFIRM) || option.equals(CANCEL))
+            monitor.setSprinkler(getSprinklerStateFromUser(option));
     }
 
     @Override
