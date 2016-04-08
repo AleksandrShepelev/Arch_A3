@@ -1,13 +1,8 @@
 package Sensors;
 
 import Framework.BaseSensor;
-import Framework.MessageProtocol;
 import Framework.TimeMessage;
-import MessagePackage.Message;
 
-/**
- * Created by Aleksandr on 08.04.2016.
- */
 public abstract class EventSensor extends BaseSensor {
     protected boolean _currentState = false; //state of sensor: false - usual situation, true - alarm situation
     protected int _messageType; //type of message
@@ -31,10 +26,11 @@ public abstract class EventSensor extends BaseSensor {
         _mw.WriteMessage("   Initial  "+ getName() +"  State set :: " + _currentState);
     }
 
+    //Simulator of event
     @Override
     protected void afterHandle() {
         //if door is opened then repeat it BREAK_DURATION times and randomize according to probability, otherwise randomize
-        if (_currentState == true) {
+        if (_currentState) {
             if (_currentDuration >= BREAK_DURATION) {
                 _currentDuration = 0;
                 _currentState = probabilisticCoinToss(EVENT_PROBABILITY);

@@ -2,7 +2,7 @@ package Controllers;
 
 import Framework.BaseController;
 import Framework.MessageProtocol;
-import MessagePackage.Message;
+import Framework.TimeMessage;
 
 public class SecurityController extends BaseController{
 
@@ -20,9 +20,9 @@ public class SecurityController extends BaseController{
         controller.execute();
     }
 
-    private void handleControlSecurityAlarm(Message msg)
+    private void handleControlSecurityAlarm(TimeMessage msg)
     {
-        String msgBody = msg.GetMessage();
+        String msgBody = msg.getMessageText();
         switch (msgBody) {
             case MessageProtocol.Body.SECURITY_ALARM_ON:
                 _securityAlarmOn=true;
@@ -39,7 +39,7 @@ public class SecurityController extends BaseController{
     }
 
     @Override
-    public void handleMessage(Message msg)
+    public void handleMessage(TimeMessage msg)
     {
         if(msg.GetMessageId() == MessageProtocol.Type.SECURITY_ALARM){
             handleControlSecurityAlarm(msg);
@@ -56,10 +56,10 @@ public class SecurityController extends BaseController{
     }
 
     private void sendAcknowledgement() {
-        Message msg = new Message(MessageProtocol.Type.ACKNOWLEDGEMENT, getAcknowledgementMessage());
+        TimeMessage msg = new TimeMessage(MessageProtocol.Type.ACKNOWLEDGEMENT, getAcknowledgementMessage());
         // Here we send the message to the message manager.
         try {
-            _em.SendMessage(msg);
+            _em.SendMessage(msg.getMessage());
             _mw.WriteMessage("Current "+ getName() +" Send acknowledgement  " + getAcknowledgementMessage());
 
         } catch (Exception e) {

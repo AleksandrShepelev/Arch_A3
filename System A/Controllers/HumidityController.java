@@ -2,6 +2,7 @@ package Controllers;
 
 import Framework.BaseController;
 import Framework.MessageProtocol;
+import Framework.TimeMessage;
 import InstrumentationPackage.*;
 import MessagePackage.*;
 
@@ -60,8 +61,8 @@ public class HumidityController extends BaseController {
         return 0.60f;
     }
 
-    private void handleControlHumidity(Message msg) {
-        switch (msg.GetMessage().toUpperCase()) {
+    private void handleControlHumidity(TimeMessage msg) {
+        switch (msg.getMessageText().toUpperCase()) {
             case MessageProtocol.Body.HUMIDIFIER_ON:
                 _humidifierState = true;
                 _mw.WriteMessage("Received humidifier on message");
@@ -81,11 +82,11 @@ public class HumidityController extends BaseController {
             default:
                 break;
         }
-        adjustHumidity(msg.GetMessage().toUpperCase());
+        adjustHumidity(msg.getMessageText().toUpperCase());
     }
 
     @Override
-    protected void handleMessage(Message msg) {
+    protected void handleMessage(TimeMessage msg) {
         if (msg.GetMessageId() == MessageProtocol.Type.CONTROL_HUMIDITY) {
             handleControlHumidity(msg);
         }

@@ -2,6 +2,7 @@ package Controllers;
 
 import Framework.BaseController;
 import Framework.MessageProtocol;
+import Framework.TimeMessage;
 import InstrumentationPackage.*;
 import MessagePackage.*;
 
@@ -65,9 +66,9 @@ public class TemperatureController extends BaseController
         return 0.3f;
     }
 
-    private void handleControlTemperature(Message msg)
+    private void handleControlTemperature(TimeMessage msg)
     {
-        switch (msg.GetMessage().toUpperCase()) {
+        switch (msg.getMessageText().toUpperCase()) {
             case MessageProtocol.Body.HEATER_ON:
                 _heaterState = true;
                 _mw.WriteMessage("Received heater on message" );
@@ -87,11 +88,11 @@ public class TemperatureController extends BaseController
             default:
                 break;
         }
-        adjustTemperature(msg.GetMessage().toUpperCase());
+        adjustTemperature(msg.getMessageText().toUpperCase());
     }
 
     @Override
-    protected void handleMessage(Message msg)
+    protected void handleMessage(TimeMessage msg)
     {
         if (msg.GetMessageId() == MessageProtocol.Type.CONTROL_TEMPERATURE) {
             handleControlTemperature(msg);

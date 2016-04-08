@@ -58,7 +58,7 @@ public class HumiditySensor extends BaseSensor
 
     private void handleAdjustHumidity(TimeMessage msg)
     {
-        switch (msg.GetMessage().toUpperCase()) {
+        switch (msg.getMessageText().toUpperCase()) {
             case MessageProtocol.Body.HUMIDIFIER_ON:
                 _humidifierState = true;
                 break;

@@ -1,8 +1,3 @@
-/**
- * @author Anton V. Trantin (anton@trantin.ru)
- * Innopolis University
- * Date: 08.04.16
- */
 package Framework;
 
 import MessagePackage.Message;
@@ -13,10 +8,10 @@ public class TimeMessage {
 
     private Message _msg;
 
-    private int _timestamp;
+    private long _timestamp;
     private String _message;
 
-    public String GetMessage() {
+    public String getMessageText() {
         return _message;
     }
 
@@ -28,33 +23,33 @@ public class TimeMessage {
         return _msg;
     }
 
-    private void SetMessage(String msg) {
-        _message = msg;
+    private void setMessageText(String msgText) {
+        _message = msgText;
     }
 
-    public int getTimestamp() {
+    public long getTimestamp() {
         return _timestamp;
     }
 
-    public void setTimestamp(int ts) {
+    private void setTimestamp(long ts) {
         _timestamp = ts;
     }
 
     public TimeMessage(int MsgId, String Text) {
-        _msg = new Message(MsgId, Text);
+        _timestamp = System.currentTimeMillis();
+        _msg = new Message(MsgId, String.valueOf(_timestamp)+BODY_DELIMETER+Text);
     }
 
     public TimeMessage(Message msg) {
         String body = msg.GetMessage();
         String[] parts = body.split(BODY_DELIMETER);
         try {
-            int ts = Integer.parseInt(parts[0]);
-            SetMessage(parts[1]);
+            long ts = Long.parseLong(parts[0]);
+            setMessageText(parts[1]);
             _msg.SetSenderId(msg.GetSenderId());
             setTimestamp(ts);
         } catch (Exception e) {
             System.out.println("Error parsing message body: " + body);
         }
     }
-
 }

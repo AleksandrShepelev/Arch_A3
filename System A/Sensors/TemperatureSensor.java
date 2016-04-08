@@ -58,7 +58,7 @@ public class TemperatureSensor extends BaseSensor
 
     private void handleAdjustTemperature(TimeMessage msg)
     {
-        switch (msg.GetMessage().toUpperCase()) {
+        switch (msg.getMessageText().toUpperCase()) {
             case MessageProtocol.Body.HEATER_ON:
                 _heaterState = true;
                 break;
