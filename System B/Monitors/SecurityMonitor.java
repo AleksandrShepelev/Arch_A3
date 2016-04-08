@@ -75,7 +75,7 @@ class SecurityMonitor extends BaseMonitor {
     private void handleFire(TimeMessage msg) {
         if(msg.getMessageText().equalsIgnoreCase(MessageProtocol.Body.FIRE)){
             _isOnFire = true;
-        }else {
+        }else if(msg.getMessageText().equalsIgnoreCase(MessageProtocol.Body.NO_FIRE)) {
             _isOnFire = false;
         }
     }
@@ -126,7 +126,7 @@ class SecurityMonitor extends BaseMonitor {
         if(_previousFireAlarmState == _isOnFire){
             return;
         }
-
+        _previousFireAlarmState = _isOnFire;
         String body =
                 _isOnFire
                     ? MessageProtocol.Body.FIRE_ALARM_ON
