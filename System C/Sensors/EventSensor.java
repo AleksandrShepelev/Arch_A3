@@ -4,14 +4,14 @@ import Framework.BaseSensor;
 import Framework.TimeMessage;
 
 public abstract class EventSensor extends BaseSensor {
-    protected boolean _currentState = false; //state of sensor: false - usual situation, true - alarm situation
-    protected int _messageType; //type of message
+    private boolean _currentState = false; //state of sensor: false - usual situation, true - alarm situation
+    private int _messageType; //type of message
     /*
     constants for simulation
      */
-    protected static final float EVENT_PROBABILITY = 0.05f; //probability that door will be opened
-    protected static final float BREAK_DURATION = 4; //if door is broken, we will repeat this message (BREAK_DURATION times + 1).
-    protected int _currentDuration = 0; //counter for repeated messages (See previous option)
+    private static final float EVENT_PROBABILITY = 0.05f; //probability that door will be opened
+    private static final float BREAK_DURATION = 4; //if door is broken, we will repeat this message (BREAK_DURATION times + 1).
+    private int _currentDuration = 0; //counter for repeated messages (See previous option)
 
 
     protected EventSensor(String[] args, int messageType) {
