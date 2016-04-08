@@ -16,7 +16,8 @@ class SecurityMonitor extends BaseMonitor {
     private boolean _isWindowBroken;
     private boolean _isDoorBroken;
     private boolean _isMotionDetected;
-    private boolean _previousAlarmingState;
+    private boolean _previousSecurityAlarmState;
+    private boolean _previousFireAlarmState;
     private boolean _isOnFire;
 
     private HashMap <Long, StoredMessage> _messageStorage = new HashMap<>();
@@ -116,8 +117,22 @@ class SecurityMonitor extends BaseMonitor {
 
     @Override
     protected void afterHandle() {
-        sendAlarmStateToController();
+        sendSecurityAlarmState();
+        sendFireAlarmState();
         resendNotDeliveredMessages();
+    }
+
+    private void sendFireAlarmState() {
+        if(_previousFireAlarmState == _isOnFire){
+            return;
+        }
+
+        String body =
+                _isOnFire
+                    ? MessageProtocol.Body.FIRE_ALARM_ON
+                    : MessageProtocol.Body.FIRE_ALARM_OFF;
+
+        sendMessage(new TimeMessage(MessageProtocol.Type.FIRE_ALARM, body));
     }
 
     private void resendNotDeliveredMessages() {
@@ -135,16 +150,16 @@ class SecurityMonitor extends BaseMonitor {
         _messageStorage = clonedObj;
     }
 
-    private void sendAlarmStateToController() {
+    private void sendSecurityAlarmState() {
         String body;
-        boolean isSecured = !_isWindowBroken && !_isDoorBroken && !_isMotionDetected;
-        boolean isAlarming = _armed && !isSecured;
+        boolean isSafetyEnsured = !_isWindowBroken && !_isDoorBroken && !_isMotionDetected;
+        boolean isAlarming = _armed && !isSafetyEnsured;
 
-        if(isAlarming == _previousAlarmingState){
+        if(isAlarming == _previousSecurityAlarmState){
             return;
         }
 
-        _previousAlarmingState = isAlarming;
+        _previousSecurityAlarmState = isAlarming;
         _mw.WriteMessage(isAlarming ? "Turning on the alarm" : "Turning off the alarm");
 
         body = isAlarming
@@ -155,7 +170,7 @@ class SecurityMonitor extends BaseMonitor {
 
         String displayMsg = !_armed
                                 ? "DISARMED"
-                                : isSecured
+                                : isSafetyEnsured
                                     ? "NO ALARM"
                                     : "ALARM";
         int color = isAlarming ? 3 : 0;
