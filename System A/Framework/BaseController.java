@@ -5,5 +5,9 @@
  */
 package Framework;
 
-public class BaseController {
+abstract public class BaseController extends BaseConnector
+{
+    protected BaseController(String[] args) {
+        super(args);
+    }
 }
