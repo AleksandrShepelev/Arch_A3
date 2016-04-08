@@ -59,7 +59,7 @@ public class SecurityConsole extends BaseConsole {
             monitor.setArmedState(getNewStateFromUser(monitor.isArmed(), option));
 
         if (option.equals(CONFIRM) || option.equals(CANCEL))
-            monitor.setSprinkler(getSprinklerStateFromUser(option));
+            monitor.setSprinkerState(getSprinklerStateFromUser(option));
     }
 
     @Override
