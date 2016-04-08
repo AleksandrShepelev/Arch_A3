@@ -13,10 +13,10 @@ import MessagePackage.MessageQueue;
 abstract class BaseComponent {
 
     private static final int SLEEP_DELAY = 2500;    // The loop delay (2.5 seconds)
-    private static final int RETRY_COUNT = 5;       // Number of retries for acknowledged delivery
+    private static final int RETRY_COUNT = 10;       // Number of retries for acknowledged delivery
 
     private boolean _registered = true;             // Signifies that this class is registered with an message manager.
-    protected boolean _signed = false;                // Signifies that this class is registered in the maintenance monitor
+    boolean _signed = false;                // Signifies that this class is registered in the maintenance monitor
 
     protected MessageManagerInterface _em = null;   // Interface object to the message manager
     protected MessageWindow _mw = null;
@@ -101,11 +101,11 @@ abstract class BaseComponent {
         String body = getType() + TimeMessage.BODY_DELIMETER + getName();
 
         // Here we create the message.
-        Message msg = new Message(MessageProtocol.Type.REGISTER_DEVICE, body);
+        TimeMessage msg = new TimeMessage(MessageProtocol.Type.REGISTER_DEVICE, body);
 
         // Here we send the message to the message manager.
         try {
-            _em.SendMessage(msg);
+            _em.SendMessage(msg.getMessage());
             _mw.WriteMessage("Trying to register::  " + body);
 
         } catch (Exception e) {
@@ -115,8 +115,9 @@ abstract class BaseComponent {
 
     private void checkSignUp(TimeMessage msg) {
         if (msg.GetMessageId() == MessageProtocol.Type.ACKNOWLEDGEMENT &&
-                msg.getMessage().GetMessage().toUpperCase().equals(getType())) {
+                msg.getMessageText().toUpperCase().equals(getType())) {
             _signed = true;
+            _mw.WriteMessage("Registration done");
         }
     }
 
@@ -159,7 +160,9 @@ abstract class BaseComponent {
                     timeMessage = new TimeMessage(msg);
 
                     // check if the device is signed up
-                    checkSignUp(timeMessage);
+                    if (!isSigned() && signCounter < getRetryCount()) {
+                        checkSignUp(timeMessage);
+                    }
 
                     // handle other messages
                     handleMessage(timeMessage);
