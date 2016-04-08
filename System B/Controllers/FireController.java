@@ -42,15 +42,16 @@ public class FireController extends BaseController {
             case MessageProtocol.Body.FIRE_ALARM_ON:
                 _fireAlarmState = true;
                 _mw.WriteMessage("Security alarm is turned on!");
-                return MessageProtocol.Body.ACK_FIRE_ALARM_ON;
+                break;
             case MessageProtocol.Body.FIRE_ALARM_OFF:
                 _fireAlarmState = false;
                 _mw.WriteMessage("Security alarm is turned off!");
-                return MessageProtocol.Body.ACK_FIRE_ALARM_OFF;
+                break;
             default:
                 _mw.WriteMessage("Unexpected message body in Fire alarm controller: " + msgBody);
-                return null;
+                break;
         }
+        return String.valueOf(msg.getTimestamp());
     }
     @Override
     protected String getName() {
