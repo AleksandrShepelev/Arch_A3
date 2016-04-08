@@ -108,11 +108,15 @@ class SecurityMonitor extends BaseMonitor {
     }
 
     private void updateMessagesAge() {
-        _messageStorage.forEach((aLong, message) -> {
+        _messageStorage.forEach((aLong, storedMessage) -> storedMessage.incAge());
+        HashMap<Long, StoredMessage> clonedObj = (HashMap<Long, StoredMessage>)_messageStorage.clone();
+        _messageStorage.forEach((key, message) -> {
             if(message.Age > 10){
+                System.out.println("Lost message repeated " + message.Message.GetMessage());
                 sendMessage(new TimeMessage(message.Message));
-            }
-            message.incAge();});
+                clonedObj.remove(key);
+            }});
+        _messageStorage = clonedObj;
     }
 
     private void sendAlarmState() {
@@ -137,7 +141,6 @@ class SecurityMonitor extends BaseMonitor {
 
         sendMessage(timeMsg);
 
-        _messageStorage.put(timeMsg.getTimestamp(), new StoredMessage(timeMsg.getMessage()));
     }
 
     private void sendMessage(TimeMessage timeMsg) {
@@ -146,6 +149,8 @@ class SecurityMonitor extends BaseMonitor {
         } catch (Exception e) {
             System.out.println("Error sending Security alarm control message:: " + e);
         }
+        _messageStorage.put(timeMsg.getTimestamp(), new StoredMessage(timeMsg.getMessage()));
+
     }
 
     void setArmedState(boolean armed) {
