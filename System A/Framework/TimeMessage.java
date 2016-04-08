@@ -41,8 +41,11 @@ public class TimeMessage {
     }
 
     public TimeMessage(Message msg) {
+        _msg = msg;
         String body = msg.GetMessage();
         String[] parts = body.split(BODY_DELIMETER);
+        System.out.println(parts[0]);
+        System.out.println(parts[1]);
         try {
             long ts = Long.parseLong(parts[0]);
             setMessageText(parts[1]);
@@ -50,6 +53,7 @@ public class TimeMessage {
             setTimestamp(ts);
         } catch (Exception e) {
             System.out.println("Error parsing message body: " + body);
+            e.printStackTrace();
         }
     }
 }
