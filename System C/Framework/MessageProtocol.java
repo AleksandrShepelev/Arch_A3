@@ -53,10 +53,19 @@ public class MessageProtocol
         public static final String DEHUMIDIFIER_OFF = "D0";
 
 
-        // new
-        public static final String REG_WINDOW = "W"; // ...
-        //@TODO add messages for different sensors (D, M, F, T, H)
+        // Devices sign UP messages
+        public static final String REG_WINDOW = "W"; // Window sensor
+        public static final String REG_DOOR = "D"; // Door sensor
+        public static final String REG_MOTION = "M"; // Motion sensor
+        public static final String REG_TEMPERATURE = "T"; // Temperature sensor
+        public static final String REG_HUMIDITY = "H"; // Humidity sensor
+        public static final String REG_FIRE = "F"; // Fire sensor
 
+        public static final String REG_TEMPERATURE_CONTROLLER = "TC";
+        public static final String REG_HUMIDITY_CONTROLLER = "HC";
+        public static final String REG_SECURITY_CONTROLLER = "SC";
+        public static final String REG_FIRE_CONTROLLER = "FC";
+        public static final String REG_SPRINKLER_CONTROLLER = "SPC";
 
         public static final String ACK_SPRINKLER_ON = "AS1"; //..
         //@TODO add messages for different ack.. (AS0, AWDM1, etc.)

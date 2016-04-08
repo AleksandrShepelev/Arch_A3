@@ -11,6 +11,7 @@ abstract public class BaseMonitor extends BaseComponent implements Runnable {
 
     protected BaseMonitor(String[] args) {
         super(args);
+        _signed = true; // we don't need additional sign up for monitor
     }
 
     public void run() {

@@ -30,6 +30,11 @@ public class TemperatureSensor extends BaseSensor
     }
 
     @Override
+    protected String getType() {
+        return MessageProtocol.Body.REG_TEMPERATURE;
+    }
+
+    @Override
     protected float getWinPosX()
     {
         return 0.5f;

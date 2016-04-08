@@ -19,6 +19,11 @@ public class MaintenanceMonitor extends BaseMonitor {
     }
 
     @Override
+    protected String getType() {
+        return null;
+    }
+
+    @Override
     protected float getWinPosX() {
         return 0;
     }

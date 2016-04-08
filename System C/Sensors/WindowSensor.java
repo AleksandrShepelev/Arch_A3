@@ -21,6 +21,11 @@ public class WindowSensor extends BaseSensor {
     }
 
     @Override
+    protected String getType() {
+        return MessageProtocol.Body.REG_WINDOW;
+    }
+
+    @Override
     protected String getName() {
         return "Window sensor";
     }

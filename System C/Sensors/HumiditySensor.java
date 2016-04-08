@@ -38,6 +38,11 @@ public class HumiditySensor extends BaseSensor
         sensor.execute();
 	} // main
 
+    @Override
+    protected String getType() {
+        return MessageProtocol.Body.REG_HUMIDITY;
+    }
+
 	@Override
 	protected String getName()
     {
