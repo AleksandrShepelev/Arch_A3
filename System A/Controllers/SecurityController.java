@@ -7,6 +7,7 @@ import MessagePackage.Message;
 public class SecurityController extends BaseController{
 
     private static final String CONTROLLER_NAME ="Security controller";
+
     private Boolean _securityAlarmOn = false;
 
     protected SecurityController(String[] args) {
@@ -23,26 +24,13 @@ public class SecurityController extends BaseController{
     {
         String msgBody = msg.GetMessage();
         switch (msgBody) {
-            case MessageProtocol.Body.WINDOW_BROKEN:
+            case MessageProtocol.Body.SECURITY_ALARM_ON:
                 _securityAlarmOn=true;
-                _mw.WriteMessage("ALARM: Window is broken!");
+                _mw.WriteMessage("Security alarm is turned on!");
                 break;
-            case MessageProtocol.Body.WINDOW_OK:
+            case MessageProtocol.Body.SECURITY_ALARM_OFF:
                 _securityAlarmOn=false;
-                break;
-            case MessageProtocol.Body.DOOR_BROKEN:
-                _securityAlarmOn=true;
-                _mw.WriteMessage("ALARM: Door is broken!");
-                break;
-            case MessageProtocol.Body.DOOR_OK:
-                _securityAlarmOn=false;
-                break;
-            case MessageProtocol.Body.MOTION_DETECTED:
-                _securityAlarmOn=true;
-                _mw.WriteMessage("ALARM: Motion detected!");
-                break;
-            case MessageProtocol.Body.MOTION_OK:
-                _securityAlarmOn=false;
+                _mw.WriteMessage("Security alarm is turned off!");
                 break;
             default:
                 _mw.WriteMessage("Unexpected message body in Security Controller: " + msgBody);
@@ -55,7 +43,27 @@ public class SecurityController extends BaseController{
     {
         if(msg.GetMessageId() == MessageProtocol.Type.SECURITY_ALARM){
             handleControlSecurityAlarm(msg);
-            //senAcknowledgement();
+            sendAcknowledgement();
+        }
+    }
+
+    private String getAcknowledgementMessage() {
+        if (_securityAlarmOn) {
+            return MessageProtocol.Body.ACK_SECURITY_ALARM_ON;
+        }
+        else
+            return MessageProtocol.Body.ACK_SECURITY_ALARM_OFF;
+    }
+
+    private void sendAcknowledgement() {
+        Message msg = new Message(MessageProtocol.Type.ACKNOWLEDGEMENT, getAcknowledgementMessage());
+        // Here we send the message to the message manager.
+        try {
+            _em.SendMessage(msg);
+            _mw.WriteMessage("Current "+ getName() +" Send acknowledgement  " + getAcknowledgementMessage());
+
+        } catch (Exception e) {
+            System.out.println("Error Posting acknowledgement "+ getName() +"  Error:: " + e);
         }
     }
 
