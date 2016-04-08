@@ -3,6 +3,8 @@
 PAUSE
 %ECHO ECS Monitoring Console
 START "MUSEUM ENVIRONMENTAL CONTROL SYSTEM CONSOLE" /NORMAL java Monitors.ECSConsole %1
+%ECHO ECS Monitoring Console
+START "MUSEUM SECURITY CONSOLE" /NORMAL java Monitors.SecurityConsole %1
 %ECHO Starting Temperature Controller Console
 START "TEMPERATURE CONTROLLER CONSOLE" /MIN /NORMAL java Controllers.TemperatureController %1
 %ECHO Starting Humidity Controller Console
