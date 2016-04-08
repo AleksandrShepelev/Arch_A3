@@ -8,10 +8,8 @@ public class SecurityController extends BaseController{
 
     private static final String CONTROLLER_NAME ="Security controller";
 
-    private Boolean _securityAlarmOn = false;
-
-    protected SecurityController(String[] args) {
-        super(args);
+    private SecurityController(String[] args) {
+        super(args,MessageProtocol.Type.SECURITY_ALARM);
     }
 
     public void main (String args[])
@@ -20,50 +18,20 @@ public class SecurityController extends BaseController{
         controller.execute();
     }
 
-    private void handleControlSecurityAlarm(TimeMessage msg)
+    @Override
+    protected String handleDeviceOutput(TimeMessage msg)
     {
         String msgBody = msg.getMessageText();
         switch (msgBody) {
             case MessageProtocol.Body.SECURITY_ALARM_ON:
-                _securityAlarmOn=true;
                 _mw.WriteMessage("Security alarm is turned on!");
-                break;
+                return MessageProtocol.Body.ACK_SECURITY_ALARM_ON;
             case MessageProtocol.Body.SECURITY_ALARM_OFF:
-                _securityAlarmOn=false;
                 _mw.WriteMessage("Security alarm is turned off!");
-                break;
+                return MessageProtocol.Body.ACK_SECURITY_ALARM_OFF;
             default:
                 _mw.WriteMessage("Unexpected message body in Security Controller: " + msgBody);
-                break;
-        }
-    }
-
-    @Override
-    public void handleMessage(TimeMessage msg)
-    {
-        if(msg.GetMessageId() == MessageProtocol.Type.SECURITY_ALARM){
-            handleControlSecurityAlarm(msg);
-            sendAcknowledgement();
-        }
-    }
-
-    private String getAcknowledgementMessage() {
-        if (_securityAlarmOn) {
-            return MessageProtocol.Body.ACK_SECURITY_ALARM_ON;
-        }
-        else
-            return MessageProtocol.Body.ACK_SECURITY_ALARM_OFF;
-    }
-
-    private void sendAcknowledgement() {
-        TimeMessage msg = new TimeMessage(MessageProtocol.Type.ACKNOWLEDGEMENT, getAcknowledgementMessage());
-        // Here we send the message to the message manager.
-        try {
-            _em.SendMessage(msg.getMessage());
-            _mw.WriteMessage("Current "+ getName() +" Send acknowledgement  " + getAcknowledgementMessage());
-
-        } catch (Exception e) {
-            System.out.println("Error Posting acknowledgement "+ getName() +"  Error:: " + e);
+                return null;
         }
     }
 

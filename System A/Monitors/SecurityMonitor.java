@@ -4,8 +4,6 @@ import Framework.BaseMonitor;
 import Framework.MessageProtocol;
 import Framework.TimeMessage;
 import InstrumentationPackage.Indicator;
-import MessagePackage.Message;
-import MessagePackage.MessageManagerInterface;
 
 public class SecurityMonitor extends BaseMonitor{
 
@@ -98,6 +96,7 @@ public class SecurityMonitor extends BaseMonitor{
         }
     }
 
+    @Override
     protected void afterHandle()
     {
         sendAlarmState();
@@ -107,16 +106,18 @@ public class SecurityMonitor extends BaseMonitor{
     {
         TimeMessage msg;
         String body;
+        Boolean isAlarming = _isWindowBroken || _isDoorBroken || _isMotionDetected;
+        _mw.WriteMessage(isAlarming ? "Turning on the alarm" : "Turning off the alarm");
 
-        body = _isWindowBroken || _isDoorBroken || _isMotionDetected
-                ? MessageProtocol.Body.WDM_ALARM_ON
-                : MessageProtocol.Body.WDM_ALARM_OFF;
+        body = isAlarming
+                ? MessageProtocol.Body.SECURITY_ALARM_ON
+                : MessageProtocol.Body.SECURITY_ALARM_OFF;
         msg = new TimeMessage(MessageProtocol.Type.SECURITY_ALARM, body);
 
         try {
             _em.SendMessage(msg.getMessage());
         } catch (Exception e) {
-            System.out.println("Error sending heater control message:: " + e);
+            System.out.println("Error sending Security alarm control message:: " + e);
         }
     }
 
