@@ -68,12 +68,12 @@ public class WindowSensor extends BaseSensor {
         if (_currentWindowState == true) {
             if (_currentDuration >= BREAK_DURATION-1) {
                 _currentDuration = 0;
-                _currentWindowState = probablisticCoinToss(EVENT_PROBABILITY);
+                _currentWindowState = probabilisticCoinToss(EVENT_PROBABILITY);
             } else {
                 _currentDuration++;
             }
         } else {
-            _currentWindowState = probablisticCoinToss(EVENT_PROBABILITY);
+            _currentWindowState = probabilisticCoinToss(EVENT_PROBABILITY);
         }
 
     }
