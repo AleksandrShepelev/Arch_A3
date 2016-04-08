@@ -1,4 +1,4 @@
-package Sensors;
+package Controllers;
 
 import Framework.BaseController;
 import Framework.MessageProtocol;
