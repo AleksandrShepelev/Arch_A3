@@ -2,6 +2,7 @@ package Controllers;
 
 import Framework.BaseController;
 import Framework.MessageProtocol;
+import Framework.TimeMessage;
 import InstrumentationPackage.*;
 import MessagePackage.*;
 
@@ -12,7 +13,7 @@ public class HumidityController extends BaseController {
     private boolean _dehumidifierState = false;
 
     protected HumidityController(String[] args) {
-        super(args);
+        super(args,MessageProtocol.Type.CONTROL_HUMIDITY);
     }
 
     @Override
@@ -51,6 +52,11 @@ public class HumidityController extends BaseController {
     }
 
     @Override
+    protected String getType() {
+        return MessageProtocol.Body.REG_HUMIDITY_CONTROLLER;
+    }
+
+    @Override
     protected float getWinPosX() {
         return 0.0f;
     }
@@ -60,35 +66,29 @@ public class HumidityController extends BaseController {
         return 0.60f;
     }
 
-    private void handleControlHumidity(Message msg) {
-        switch (msg.GetMessage().toUpperCase()) {
+    @Override
+    protected String handleDeviceOutput(TimeMessage msg) {
+        switch (msg.getMessageText().toUpperCase()) {
             case MessageProtocol.Body.HUMIDIFIER_ON:
                 _humidifierState = true;
                 _mw.WriteMessage("Received humidifier on message");
-                break;
+                return MessageProtocol.Body.ACK_HUMIDIFIER_ON;
             case MessageProtocol.Body.HUMIDIFIER_OFF:
                 _humidifierState = false;
                 _mw.WriteMessage("Received humidifier off message");
-                break;
+                return MessageProtocol.Body.ACK_HUMIDIFIER_OFF;
             case MessageProtocol.Body.DEHUMIDIFIER_ON:
                 _dehumidifierState = true;
                 _mw.WriteMessage("Received dehumidifier on message");
-                break;
+                return MessageProtocol.Body.ACK_DEHUMIDIFIER_ON;
             case MessageProtocol.Body.DEHUMIDIFIER_OFF:
                 _dehumidifierState = false;
                 _mw.WriteMessage("Received dehumidifier off message");
-                break;
+                return MessageProtocol.Body.ACK_DEHUMIDIFIER_OFF;
             default:
-                break;
         }
-        adjustHumidity(msg.GetMessage().toUpperCase());
-    }
-
-    @Override
-    protected void handleMessage(Message msg) {
-        if (msg.GetMessageId() == MessageProtocol.Type.CONTROL_HUMIDITY) {
-            handleControlHumidity(msg);
-        }
+        adjustHumidity(msg.getMessageText().toUpperCase());
+        return null;
     }
 
     private void handleHumidifierState() {

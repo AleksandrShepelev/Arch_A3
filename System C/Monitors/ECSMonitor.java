@@ -7,12 +7,10 @@ package Monitors;
 
 import Framework.BaseMonitor;
 import Framework.MessageProtocol;
+import Framework.TimeMessage;
 import InstrumentationPackage.Indicator;
-import MessagePackage.Message;
 
-public class ECSMonitor extends BaseMonitor {
-
-    private static final int SLEEP_DELAY = 1000;    // The loop delay (1 second)
+class ECSMonitor extends BaseMonitor {
 
     private Indicator _ti;
     private Indicator _hi;
@@ -28,13 +26,8 @@ public class ECSMonitor extends BaseMonitor {
     private boolean ON = true;                // Used to turn on heaters, chillers, humidifiers, and dehumidifiers
     private boolean OFF = false;            // Used to turn off heaters, chillers, humidifiers, and dehumidifiers
 
-    protected ECSMonitor(String[] args) {
+    ECSMonitor(String[] args) {
         super(args);
-    }
-
-    @Override
-    protected int getSleepDelay() {
-        return SLEEP_DELAY;
     }
 
     @Override
@@ -70,7 +63,7 @@ public class ECSMonitor extends BaseMonitor {
     }
 
     @Override
-    protected void handleMessage(Message msg) {
+    protected void handleMessage(TimeMessage msg) {
         if (msg.GetMessageId() == MessageProtocol.Type.TEMPERATURE) {
             handleTemperature(msg);
         }
@@ -79,17 +72,17 @@ public class ECSMonitor extends BaseMonitor {
         }
     }
 
-    private void handleTemperature(Message msg) {
+    private void handleTemperature(TimeMessage msg) {
         try {
-            _currentTemperature = Float.valueOf(msg.GetMessage());
+            _currentTemperature = Float.valueOf(msg.getMessageText());
         } catch (Exception e) {
             _mw.WriteMessage("Error reading temperature: " + e);
         } // catch
     }
 
-    private void handleHumidity(Message msg) {
+    private void handleHumidity(TimeMessage msg) {
         try {
-            _currentHumidity = Float.valueOf(msg.GetMessage());
+            _currentHumidity = Float.valueOf(msg.getMessageText());
         } catch (Exception e) {
             _mw.WriteMessage("Error reading humidity: " + e);
         } // catch
@@ -142,14 +135,14 @@ public class ECSMonitor extends BaseMonitor {
         } // if
     }
 
-    public void setTemperatureRange(float lowTemp, float highTemp) {
+    void setTemperatureRange(float lowTemp, float highTemp) {
         _tempRangeHigh = highTemp;
         _tempRangeLow = lowTemp;
         _mw.WriteMessage("***Temperature range changed to::" + _tempRangeLow + "F - " + _tempRangeHigh + "F***");
 
     } // SetTemperatureRange
 
-    public void setHumidityRange(float lowHumi, float highHumi) {
+    void setHumidityRange(float lowHumi, float highHumi) {
         _humiRangeHigh = highHumi;
         _humiRangeLow = lowHumi;
         _mw.WriteMessage("***Humidity range changed to::" + _humiRangeLow + "% - " + _humiRangeHigh + "%***");
@@ -157,18 +150,18 @@ public class ECSMonitor extends BaseMonitor {
 
     private void heater(boolean ON) {
         // Here we create the message.
-        Message msg;
+        TimeMessage msg;
         String body;
         if (ON) {
             body = MessageProtocol.Body.HEATER_ON;
         } else {
             body = MessageProtocol.Body.HEATER_OFF;
         }
-        msg = new Message(MessageProtocol.Type.CONTROL_TEMPERATURE, body);
+        msg = new TimeMessage(MessageProtocol.Type.CONTROL_TEMPERATURE, body);
 
         // Here we send the message to the message manager.
         try {
-            _em.SendMessage(msg);
+            _em.SendMessage(msg.getMessage());
         } catch (Exception e) {
             System.out.println("Error sending heater control message:: " + e);
         }
@@ -176,18 +169,18 @@ public class ECSMonitor extends BaseMonitor {
 
     private void chiller(boolean ON) {
         // Here we create the message.
-        Message msg;
+        TimeMessage msg;
         String body;
         if (ON) {
             body = MessageProtocol.Body.CHILLER_ON;
         } else {
             body = MessageProtocol.Body.CHILLER_OFF;
         }
-        msg = new Message(MessageProtocol.Type.CONTROL_TEMPERATURE, body);
+        msg = new TimeMessage(MessageProtocol.Type.CONTROL_TEMPERATURE, body);
 
         // Here we send the message to the message manager.
         try {
-            _em.SendMessage(msg);
+            _em.SendMessage(msg.getMessage());
         } catch (Exception e) {
             System.out.println("Error sending chiller control message:: " + e);
         }
@@ -195,18 +188,18 @@ public class ECSMonitor extends BaseMonitor {
 
     private void humidifier(boolean ON) {
         // Here we create the message.
-        Message msg;
+        TimeMessage msg;
         String body;
         if (ON) {
             body = MessageProtocol.Body.HUMIDIFIER_ON;
         } else {
             body = MessageProtocol.Body.HUMIDIFIER_OFF;
         }
-        msg = new Message(MessageProtocol.Type.CONTROL_HUMIDITY, body);
+        msg = new TimeMessage(MessageProtocol.Type.CONTROL_HUMIDITY, body);
 
         // Here we send the message to the message manager.
         try {
-            _em.SendMessage(msg);
+            _em.SendMessage(msg.getMessage());
         } catch (Exception e) {
             System.out.println("Error sending humidifier control message:: " + e);
         }
@@ -214,36 +207,36 @@ public class ECSMonitor extends BaseMonitor {
 
     private void dehumidifier(boolean ON) {
         // Here we create the message.
-        Message msg;
+        TimeMessage msg;
         String body;
         if (ON) {
             body = MessageProtocol.Body.DEHUMIDIFIER_ON;
         } else {
             body = MessageProtocol.Body.DEHUMIDIFIER_OFF;
         }
-        msg = new Message(MessageProtocol.Type.CONTROL_HUMIDITY, body);
+        msg = new TimeMessage(MessageProtocol.Type.CONTROL_HUMIDITY, body);
 
         // Here we send the message to the message manager.
         try {
-            _em.SendMessage(msg);
+            _em.SendMessage(msg.getMessage());
         } catch (Exception e) {
             System.out.println("Error sending dehumidifier control message:: " + e);
         }
     } // Dehumidifier
 
-    public float getTempRangeHigh() {
+    float getTempRangeHigh() {
         return _tempRangeHigh;
     }
 
-    public float getTempRangeLow() {
+    float getTempRangeLow() {
         return _tempRangeLow;
     }
 
-    public float getHumiRangeHigh() {
+    float getHumiRangeHigh() {
         return _humiRangeHigh;
     }
 
-    public float getHumiRangeLow() {
+    float getHumiRangeLow() {
         return _humiRangeLow;
     }
 }

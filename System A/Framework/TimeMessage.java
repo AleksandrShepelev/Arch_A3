@@ -53,7 +53,7 @@ public class TimeMessage {
 
         try {
             long ts = Long.parseLong(parts[0]);
-            setMessageText(parts[1]);
+            setMessageText(body.replaceAll(parts[0] + BODY_DELIMETER, ""));
             _msg.SetSenderId(msg.GetSenderId());
             setTimestamp(ts);
         } catch (Exception e) {

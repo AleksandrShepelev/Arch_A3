@@ -52,7 +52,6 @@ public class MessageProtocol
         public static final String DEHUMIDIFIER_ON = "D1";
         public static final String DEHUMIDIFIER_OFF = "D0";
 
-
         // Devices sign UP messages
         public static final String REG_WINDOW = "W"; // Window sensor
         public static final String REG_DOOR = "D"; // Door sensor
@@ -66,6 +65,34 @@ public class MessageProtocol
         public static final String REG_SECURITY_CONTROLLER = "SC";
         public static final String REG_FIRE_CONTROLLER = "FC";
         public static final String REG_SPRINKLER_CONTROLLER = "SPC";
+
+        // new
+        public static final String SECURITY_ALARM_ON = "SC1"; // ...
+        public static final String SECURITY_ALARM_OFF = "SC0"; // ...
+
+        public static final String ACK_SECURITY_ALARM_ON = "ASEC1";
+        public static final String ACK_SECURITY_ALARM_OFF = "ASEC0";
+
+        public static final String WINDOW_BROKEN = "W1"; // ...
+        public static final String WINDOW_OK = "W0"; // ...
+        public static final String DOOR_BROKEN = "D1"; // ...
+        public static final String DOOR_OK = "D0"; // ...
+        public static final String MOTION_DETECTED = "M1"; // ...
+        public static final String MOTION_OK = "M0"; // ...
+        //@TODO add messages for different sensors (F, T, H)
+
+        public static final String ACK_HEATER_ON = "AH1";
+        public static final String ACK_HEATER_OFF = "AH0";
+
+        public static final String ACK_CHILLER_ON = "AC1";
+        public static final String ACK_CHILLER_OFF = "AC0";
+
+        public static final String ACK_DEHUMIDIFIER_ON = "AD1";
+        public static final String ACK_DEHUMIDIFIER_OFF = "AD0";
+
+        public static final String ACK_HUMIDIFIER_ON = "AHUM1";
+        public static final String ACK_HUMIDIFIER_OFF = "AHUM0";
+
 
         public static final String ACK_SPRINKLER_ON = "AS1"; //..
         //@TODO add messages for different ack.. (AS0, AWDM1, etc.)

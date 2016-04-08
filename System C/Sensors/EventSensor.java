@@ -1,7 +1,7 @@
 package Sensors;
 
 import Framework.BaseSensor;
-import MessagePackage.Message;
+import Framework.TimeMessage;
 
 abstract class EventSensor extends BaseSensor {
     private boolean _currentState = false; //state of sensor: false - usual situation, true - alarm situation
@@ -25,6 +25,7 @@ abstract class EventSensor extends BaseSensor {
         _mw.WriteMessage("   Initial  "+ getName() +"  State set :: " + _currentState);
     }
 
+    //Simulator of event
     @Override
     protected void afterHandle() {
         //if door is opened then repeat it BREAK_DURATION times and randomize according to probability, otherwise randomize
@@ -44,11 +45,11 @@ abstract class EventSensor extends BaseSensor {
     @Override
     protected void beforeHandle() {
         // Here we create the message.
-        Message msg = new Message(_messageType, String.valueOf(_currentState));
+        TimeMessage msg = new TimeMessage(_messageType, String.valueOf(_currentState));
 
         // Here we send the message to the message manager.
         try {
-            _em.SendMessage(msg);
+            _em.SendMessage(msg.getMessage());
             _mw.WriteMessage("Current "+ getName() +" State::  " + _currentState);
 
         } catch (Exception e) {

@@ -18,7 +18,12 @@ abstract public class BaseMonitor extends BaseComponent implements Runnable {
         execute();
     }
 
-    public void halt() {
+    @Override
+    protected String getType() {
+        return "MONITOR";
+    }
+
+    void halt() {
         _mw.WriteMessage("***HALT MESSAGE RECEIVED - SHUTTING DOWN SYSTEM***");
 
         // Here we create the stop message.

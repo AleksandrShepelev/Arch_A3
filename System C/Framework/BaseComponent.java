@@ -11,8 +11,10 @@ import MessagePackage.MessageManagerInterface;
 import MessagePackage.MessageQueue;
 
 abstract class BaseComponent {
+
     private static final int SLEEP_DELAY = 2500;    // The loop delay (2.5 seconds)
     private static final int RETRY_COUNT = 5;       // Number of retries for acknowledged delivery
+
     private boolean _registered = true;             // Signifies that this class is registered with an message manager.
     protected boolean _signed = false;                // Signifies that this class is registered in the maintenance monitor
 
@@ -29,14 +31,11 @@ abstract class BaseComponent {
         parseArguments(args);
     }
 
-    BaseComponent() {
-    }
-
     protected int getSleepDelay() {
         return SLEEP_DELAY;
     }
 
-    protected int getRetryCount() {
+    private int getRetryCount() {
         return RETRY_COUNT;
     }
 
@@ -44,7 +43,7 @@ abstract class BaseComponent {
         return _registered;
     }
 
-    public boolean isSigned() {
+    private boolean isSigned() {
         return _signed;
     }
 
@@ -89,7 +88,7 @@ abstract class BaseComponent {
     }
 
     // not all sensors will handle the messages
-    protected void handleMessage(Message msg) {
+    protected void handleMessage(TimeMessage msg) {
     }
 
     private void initMessageWindow() {
@@ -99,7 +98,7 @@ abstract class BaseComponent {
 
     private void signUp() {
 
-        String body = getType() + "_" + getName();
+        String body = getType() + TimeMessage.BODY_DELIMETER + getName();
 
         // Here we create the message.
         Message msg = new Message(MessageProtocol.Type.REGISTER_DEVICE, body);
@@ -114,15 +113,16 @@ abstract class BaseComponent {
         }
     }
 
-    private void checkSignUp(Message msg) {
+    private void checkSignUp(TimeMessage msg) {
         if (msg.GetMessageId() == MessageProtocol.Type.ACKNOWLEDGEMENT &&
-                msg.GetMessage().toUpperCase().equals(getType())) {
+                msg.getMessage().GetMessage().toUpperCase().equals(getType())) {
             _signed = true;
         }
     }
 
     private void handle() {
         Message msg;                // Message object
+        TimeMessage timeMessage;
         MessageQueue eq;            // Message Queue
         int signCounter = 0;        // Sign counter...i.e. how many times we tried to sign up
 
@@ -156,11 +156,13 @@ abstract class BaseComponent {
 
                     msg = eq.GetMessage();
 
+                    timeMessage = new TimeMessage(msg);
+
                     // check if the device is signed up
-                    checkSignUp(msg);
+                    checkSignUp(timeMessage);
 
                     // handle other messages
-                    handleMessage(msg);
+                    handleMessage(timeMessage);
 
                     // If the message ID == 99 then this is a signal that the simulation
                     // is to end. At this point, the loop termination flag is set to

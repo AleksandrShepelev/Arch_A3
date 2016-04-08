@@ -2,6 +2,7 @@ package Controllers;
 
 import Framework.BaseController;
 import Framework.MessageProtocol;
+import Framework.TimeMessage;
 import InstrumentationPackage.*;
 import MessagePackage.*;
 
@@ -13,7 +14,7 @@ public class TemperatureController extends BaseController
     private boolean _chillerState = false;
 
     protected TemperatureController(String[] args) {
-        super(args);
+        super(args, MessageProtocol.Type.CONTROL_TEMPERATURE);
     }
 
     @Override
@@ -56,6 +57,11 @@ public class TemperatureController extends BaseController
     }
 
     @Override
+    protected String getType() {
+        return MessageProtocol.Body.REG_TEMPERATURE_CONTROLLER;
+    }
+
+    @Override
     protected float getWinPosX() {
         return 0.0f;
     }
@@ -65,37 +71,30 @@ public class TemperatureController extends BaseController
         return 0.3f;
     }
 
-    private void handleControlTemperature(Message msg)
+    @Override
+    protected String handleDeviceOutput(TimeMessage msg)
     {
-        switch (msg.GetMessage().toUpperCase()) {
+        switch (msg.getMessageText().toUpperCase()) {
             case MessageProtocol.Body.HEATER_ON:
                 _heaterState = true;
                 _mw.WriteMessage("Received heater on message" );
-                break;
+                return MessageProtocol.Body.ACK_HEATER_ON;
             case MessageProtocol.Body.HEATER_OFF:
                 _heaterState = false;
                 _mw.WriteMessage("Received heater off message" );
-                break;
+                return MessageProtocol.Body.ACK_HEATER_OFF;
             case MessageProtocol.Body.CHILLER_ON:
                 _chillerState = true;
                 _mw.WriteMessage("Received chiller on message" );
-                break;
+                return MessageProtocol.Body.ACK_CHILLER_ON;
             case MessageProtocol.Body.CHILLER_OFF:
                 _chillerState = false;
                 _mw.WriteMessage("Received chiller off message" );
-                break;
+                return MessageProtocol.Body.ACK_CHILLER_OFF;
             default:
-                break;
         }
-        adjustTemperature(msg.GetMessage().toUpperCase());
-    }
-
-    @Override
-    protected void handleMessage(Message msg)
-    {
-        if (msg.GetMessageId() == MessageProtocol.Type.CONTROL_TEMPERATURE) {
-            handleControlTemperature(msg);
-        }
+        adjustTemperature(msg.getMessageText().toUpperCase());
+        return null;
     }
 
     private void handleHeaterState()
