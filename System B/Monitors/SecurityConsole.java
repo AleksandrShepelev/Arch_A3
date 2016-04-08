@@ -27,32 +27,23 @@ public class SecurityConsole extends BaseConsole {
         }
     }
 
-    private void handleSecurityState() {
-        SecurityMonitor monitor = (SecurityMonitor)_monitor;
-        monitor.setArmedState(getNewStateFromUser(monitor.isArmed()));
-    }
-
-    private boolean getNewStateFromUser(Boolean isArmed) {
-        System.out.println("Enter 'OFF' to arm the system");
-
-        String option;
+    private boolean getNewStateFromUser(boolean isArmed, String option) {
         String expectedInput;
-        while (true) {
-            expectedInput = isArmed ? ARM : DISARM;
-            System.out.println("Enter '" + expectedInput + "' to arm the system");
-            option = _input.KeyboardReadString();
+        expectedInput = isArmed ? DISARM : ARM ;
+        System.out.println("Enter '" + expectedInput + "' to arm the system");
 
-            if (option.equals(expectedInput)) {
-                return !isArmed;
-            }
-            System.out.println("Unexpected input, expected: " +
-                    expectedInput + ", please try again...");
-        } // while
+        if (option.equals(expectedInput)) {
+            return !isArmed;
+        }
+        else {
+            return isArmed;
+        }
     }
 
     @Override
     protected void handleUserInput(String option) {
-        handleSecurityState();
+        SecurityMonitor monitor = (SecurityMonitor)_monitor;
+        monitor.setArmedState(getNewStateFromUser(monitor.isArmed(), option));
     }
 
     @Override

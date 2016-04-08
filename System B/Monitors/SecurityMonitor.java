@@ -35,12 +35,12 @@ class SecurityMonitor extends BaseMonitor {
 
     @Override
     protected float getWinPosX() {
-        return 0.5f;
+        return 0.1f;
     }
 
     @Override
     protected float getWinPosY() {
-        return 0.2f;
+        return 0.1f;
     }
 
     @Override
@@ -96,15 +96,21 @@ class SecurityMonitor extends BaseMonitor {
     private void sendAlarmState() {
         TimeMessage msg;
         String body;
-        Boolean isAlarming = _isWindowBroken || _isDoorBroken || _isMotionDetected;
+        boolean isSecured = !_isWindowBroken && !_isDoorBroken && !_isMotionDetected;
+        boolean isAlarming = _armed && isSecured;
         _mw.WriteMessage(isAlarming ? "Turning on the alarm" : "Turning off the alarm");
 
         body = isAlarming
                 ? MessageProtocol.Body.SECURITY_ALARM_ON
                 : MessageProtocol.Body.SECURITY_ALARM_OFF;
         msg = new TimeMessage(MessageProtocol.Type.SECURITY_ALARM, body);
+        String displayMsg = !_armed
+                                ? "DISARMED"
+                                : isSecured
+                                    ? "NO ALARM"
+                                    : "ALARM";
 
-        _ai.SetLampColorAndMessage("PUT RIGHT MESSAGE HERE", 3);
+        _ai.SetLampColorAndMessage(displayMsg, 3);
 
         try {
             _em.SendMessage(msg.getMessage());

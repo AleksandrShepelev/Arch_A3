@@ -79,10 +79,10 @@ public class SprinklerController extends BaseController {
     {
         if (_sprinklerState) {
             // Set to green, chiller is on
-            _si.SetLampColorAndMessage(INDICATOR_SPRINKLER_OFF_MSG, 1);
+            _si.SetLampColorAndMessage(INDICATOR_SPRINKLER_ON_MSG, 1);
         } else {
             // Set to black, chiller is off
-            _si.SetLampColorAndMessage(INDICATOR_SPRINKLER_ON_MSG, 0);
+            _si.SetLampColorAndMessage(INDICATOR_SPRINKLER_OFF_MSG, 0);
         }
     }
 }

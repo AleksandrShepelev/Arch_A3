@@ -82,10 +82,10 @@ public class SecurityController extends BaseController{
     {
         if (_securityAlarmState) {
             // Set to green, chiller is on
-            _ai.SetLampColorAndMessage(INDICATOR_ALARM_OFF_MSG, 1);
+            _ai.SetLampColorAndMessage(INDICATOR_ALARM_ON_MSG, 1);
         } else {
             // Set to black, chiller is off
-            _ai.SetLampColorAndMessage(INDICATOR_ALARM_ON_MSG, 0);
+            _ai.SetLampColorAndMessage(INDICATOR_ALARM_OFF_MSG, 0);
         }
     }
 }
