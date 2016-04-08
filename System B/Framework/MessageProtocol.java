@@ -51,7 +51,6 @@ public class MessageProtocol
         public static final String DEHUMIDIFIER_ON = "D1";
         public static final String DEHUMIDIFIER_OFF = "D0";
 
-
         // new
         public static final String SECURITY_ALARM_ON = "SC1"; // ...
         public static final String SECURITY_ALARM_OFF = "SC0"; // ...

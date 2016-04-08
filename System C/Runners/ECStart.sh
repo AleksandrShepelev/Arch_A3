@@ -23,3 +23,10 @@ sleep 1
 java Sensors.DoorSensor &
 java Sensors.MotionSensor &
 java Sensors.WindowSensor &
+
+echo "Starting Fire and Sprinkler Controllers"
+java Controllers.FireController &
+java Controllers.SprinklerController &
+sleep 1
+
+java Sensors.Fire &
