@@ -49,10 +49,6 @@ public abstract class BaseSensor extends BaseComponent {
 
     protected static boolean probabilisticCoinToss(float eventProbability) {
         float val = _random.nextFloat();
-        if (val > (eventProbability)) {
-            return false;
-        } else {
-            return true;
-        }
+        return val <= eventProbability;
     }
 }
