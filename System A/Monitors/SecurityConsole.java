@@ -72,7 +72,7 @@ public class SecurityConsole extends BaseConsole {
     }
 
     private String getArmedStateAsString() {
-        return ((SecurityMonitor)_monitor).getArmedStateAsString();
+        return ((SecurityMonitor)_monitor).isArmed() ? "ARMED" : "DISARMED";
     }
 
 }
