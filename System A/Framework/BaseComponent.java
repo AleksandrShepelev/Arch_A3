@@ -74,6 +74,7 @@ abstract class BaseComponent
             }
         } catch (Exception e) {
             System.out.println("Error instantiating message manager interface: " + e);
+            e.printStackTrace();
             _registered = false;
         }
     }
@@ -149,7 +150,7 @@ abstract class BaseComponent
                 Thread.sleep(getSleepDelay());
 
             } catch (Exception e) {
-                _mw.WriteMessage("An error occurred");
+                _mw.WriteMessage("An error occurred: " + e);
                 e.printStackTrace();
             }
         }
@@ -187,6 +188,7 @@ abstract class BaseComponent
 
         } catch (Exception e) {
             _mw.WriteMessage("Error:: " + e);
+            e.printStackTrace();
         }
     }
 

@@ -9,7 +9,7 @@ import MessagePackage.Message;
 
 abstract public class BaseMonitor extends BaseComponent implements Runnable {
 
-    private boolean _registered = true;     // Signifies that this class is registered with an message manager.
+    private static final int SLEEP_DELAY = 1000;    // The loop delay (1 second)
 
     protected BaseMonitor(String[] args) {
         super(args);
@@ -19,11 +19,7 @@ abstract public class BaseMonitor extends BaseComponent implements Runnable {
         execute();
     }
 
-    public boolean isRegistered() {
-        return _registered;
-    }
-
-    public void halt() {
+    void halt() {
         _mw.WriteMessage("***HALT MESSAGE RECEIVED - SHUTTING DOWN SYSTEM***");
 
         // Here we create the stop message.
@@ -35,7 +31,13 @@ abstract public class BaseMonitor extends BaseComponent implements Runnable {
             _em.SendMessage(msg);
         } catch (Exception e) {
             System.out.println("Error sending halt message:: " + e);
+            e.printStackTrace();
         }
+    }
+
+    @Override
+    protected int getSleepDelay() {
+        return SLEEP_DELAY;
     }
 
 }

@@ -10,9 +10,7 @@ import Framework.MessageProtocol;
 import Framework.TimeMessage;
 import InstrumentationPackage.Indicator;
 
-public class ECSMonitor extends BaseMonitor {
-
-    private static final int SLEEP_DELAY = 1000;    // The loop delay (1 second)
+class ECSMonitor extends BaseMonitor {
 
     private Indicator _ti;
     private Indicator _hi;
@@ -28,13 +26,8 @@ public class ECSMonitor extends BaseMonitor {
     private boolean ON = true;                // Used to turn on heaters, chillers, humidifiers, and dehumidifiers
     private boolean OFF = false;            // Used to turn off heaters, chillers, humidifiers, and dehumidifiers
 
-    protected ECSMonitor(String[] args) {
+    ECSMonitor(String[] args) {
         super(args);
-    }
-
-    @Override
-    protected int getSleepDelay() {
-        return SLEEP_DELAY;
     }
 
     @Override
@@ -142,14 +135,14 @@ public class ECSMonitor extends BaseMonitor {
         } // if
     }
 
-    public void setTemperatureRange(float lowTemp, float highTemp) {
+    void setTemperatureRange(float lowTemp, float highTemp) {
         _tempRangeHigh = highTemp;
         _tempRangeLow = lowTemp;
         _mw.WriteMessage("***Temperature range changed to::" + _tempRangeLow + "F - " + _tempRangeHigh + "F***");
 
     } // SetTemperatureRange
 
-    public void setHumidityRange(float lowHumi, float highHumi) {
+    void setHumidityRange(float lowHumi, float highHumi) {
         _humiRangeHigh = highHumi;
         _humiRangeLow = lowHumi;
         _mw.WriteMessage("***Humidity range changed to::" + _humiRangeLow + "% - " + _humiRangeHigh + "%***");
@@ -231,19 +224,19 @@ public class ECSMonitor extends BaseMonitor {
         }
     } // Dehumidifier
 
-    public float getTempRangeHigh() {
+    float getTempRangeHigh() {
         return _tempRangeHigh;
     }
 
-    public float getTempRangeLow() {
+    float getTempRangeLow() {
         return _tempRangeLow;
     }
 
-    public float getHumiRangeHigh() {
+    float getHumiRangeHigh() {
         return _humiRangeHigh;
     }
 
-    public float getHumiRangeLow() {
+    float getHumiRangeLow() {
         return _humiRangeLow;
     }
 }

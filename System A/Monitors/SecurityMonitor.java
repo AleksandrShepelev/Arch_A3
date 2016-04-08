@@ -5,22 +5,16 @@ import Framework.MessageProtocol;
 import Framework.TimeMessage;
 import InstrumentationPackage.Indicator;
 
-public class SecurityMonitor extends BaseMonitor{
+class SecurityMonitor extends BaseMonitor {
 
-    private static final int SLEEP_DELAY = 1000;
     private boolean _armed = true;
     private Indicator _ai;
     private Boolean _isWindowBroken;
     private boolean _isDoorBroken;
     private boolean _isMotionDetected;
 
-    protected SecurityMonitor(String[] args) {
+    SecurityMonitor(String[] args) {
         super(args);
-    }
-
-    @Override
-    protected int getSleepDelay() {
-        return SLEEP_DELAY;
     }
 
     @Override
@@ -47,10 +41,10 @@ public class SecurityMonitor extends BaseMonitor{
     protected float getWinPosY() {
         return 0.2f;
     }
+
     @Override
-    public void handleMessage(TimeMessage msg)
-    {
-        switch (msg.GetMessageId()){
+    public void handleMessage(TimeMessage msg) {
+        switch (msg.GetMessageId()) {
             case MessageProtocol.Type.WINDOW:
                 handleWindow(msg);
                 break;
@@ -64,46 +58,46 @@ public class SecurityMonitor extends BaseMonitor{
     }
 
 
-
-    private void handleWindow(TimeMessage msg)
-    {
-        if(msg.getMessageText().equals(MessageProtocol.Body.WINDOW_BROKEN)) {
+    private void handleWindow(TimeMessage msg) {
+        if (msg.getMessageText().equals(MessageProtocol.Body.WINDOW_BROKEN)) {
             _isWindowBroken = true;
         }
 
-        if(msg.getMessageText().equals(MessageProtocol.Body.WINDOW_OK)) {
+        if (msg.getMessageText().equals(MessageProtocol.Body.WINDOW_OK)) {
             _isWindowBroken = false;
         }
     }
 
     private void handleDoor(TimeMessage msg) {
-        if(msg.getMessageText().equals(MessageProtocol.Body.DOOR_BROKEN)){
+        if (msg.getMessageText().equals(MessageProtocol.Body.DOOR_BROKEN)) {
             _isDoorBroken = true;
         }
 
-        if(msg.getMessageText().equals(MessageProtocol.Body.DOOR_OK)){
+        if (msg.getMessageText().equals(MessageProtocol.Body.DOOR_OK)) {
             _isDoorBroken = false;
         }
     }
 
     private void handleMotion(TimeMessage msg) {
-        if(msg.getMessageText().equals(MessageProtocol.Body.MOTION_DETECTED)){
+        if (msg.getMessageText().equals(MessageProtocol.Body.MOTION_DETECTED)) {
             _isMotionDetected = true;
         }
 
-        if(msg.getMessageText().equals(MessageProtocol.Body.MOTION_OK)){
+        if (msg.getMessageText().equals(MessageProtocol.Body.MOTION_OK)) {
             _isMotionDetected = false;
         }
     }
 
     @Override
-    protected void afterHandle()
-    {
+    protected void afterHandle() {
         sendAlarmState();
     }
 
-    private void sendAlarmState()
-    {
+    String getArmedStateAsString() {
+        return isArmed() ? "ARMED" : "DISARMED";
+    }
+
+    private void sendAlarmState() {
         TimeMessage msg;
         String body;
         Boolean isAlarming = _isWindowBroken || _isDoorBroken || _isMotionDetected;
@@ -114,6 +108,8 @@ public class SecurityMonitor extends BaseMonitor{
                 : MessageProtocol.Body.SECURITY_ALARM_OFF;
         msg = new TimeMessage(MessageProtocol.Type.SECURITY_ALARM, body);
 
+        _ai.SetLampColorAndMessage(getArmedStateAsString(), 3);
+
         try {
             _em.SendMessage(msg.getMessage());
         } catch (Exception e) {
@@ -121,11 +117,11 @@ public class SecurityMonitor extends BaseMonitor{
         }
     }
 
-    public void setArmedState(boolean armed) {
+    void setArmedState(boolean armed) {
         _armed = armed;
     }
 
-    public boolean isArmed() {
+    boolean isArmed() {
         return _armed;
     }
 }
