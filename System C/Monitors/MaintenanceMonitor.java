@@ -8,8 +8,12 @@ package Monitors;
 import Framework.BaseMonitor;
 import Framework.MessageProtocol;
 import Framework.TimeMessage;
+import InstrumentationPackage.MaintenanceIndicator;
 
+import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MaintenanceMonitor extends BaseMonitor {
@@ -17,13 +21,29 @@ public class MaintenanceMonitor extends BaseMonitor {
     private Map<Long, String> _devices = new HashMap<>();
     private Map<Long, Long> _devicesAlive = new HashMap<>();
 
+    private MaintenanceIndicator _mi;
+
     private MaintenanceMonitor(String[] args) {
         super(args);
     }
 
     public static void main(String[] args) {
-        MaintenanceMonitor monitor = new MaintenanceMonitor(args);
-        monitor.execute();
+        try {
+            MaintenanceMonitor monitor = new MaintenanceMonitor(args);
+            monitor.execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void unload() {
+        _mi.dispose();
+    }
+
+    @Override
+    protected void messageWindowAfterCreate() {
+        _mi = new MaintenanceIndicator();
     }
 
     @Override
@@ -86,13 +106,24 @@ public class MaintenanceMonitor extends BaseMonitor {
     @Override
     protected void afterHandle() {
 
+        List<String[]> rows = new ArrayList<>();
+
         for(Map.Entry<Long, String> entry : _devices.entrySet()) {
+            String[] row = new String[4];
             Long key = entry.getKey();
             String value = entry.getValue();
             long diff = System.currentTimeMillis() - _devicesAlive.get(key);
             float seconds = diff / 1000f;
             _mw.WriteMessage("The device " + value + " was alive " + seconds + " seconds ago");
+            String[] parts = value.split(TimeMessage.BODY_DELIMETER);
+            row[0] = String.valueOf(key);
+            row[1] = parts[0];
+            row[2] = parts[1];
+            row[3] = String.valueOf(seconds);
+            rows.add(row);
         }
+
+        _mi.setRows(rows);
 
     }
 }
