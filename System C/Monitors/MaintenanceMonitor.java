@@ -10,7 +10,6 @@ import Framework.MessageProtocol;
 import Framework.TimeMessage;
 import InstrumentationPackage.MaintenanceIndicator;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -109,17 +108,17 @@ public class MaintenanceMonitor extends BaseMonitor {
         List<String[]> rows = new ArrayList<>();
 
         for(Map.Entry<Long, String> entry : _devices.entrySet()) {
-            String[] row = new String[4];
+            String[] row = new String[MaintenanceIndicator.columnNames.length];
             Long key = entry.getKey();
             String value = entry.getValue();
             long diff = System.currentTimeMillis() - _devicesAlive.get(key);
             float seconds = diff / 1000f;
             _mw.WriteMessage("The device " + value + " was alive " + seconds + " seconds ago");
             String[] parts = value.split(TimeMessage.BODY_DELIMETER);
-            row[0] = String.valueOf(key);
-            row[1] = parts[0];
-            row[2] = parts[1];
-            row[3] = String.valueOf(seconds);
+            row[0] = String.valueOf(key); // ID
+            row[1] = parts[0]; // Type
+            row[2] = parts[1]; // Name
+            row[3] = String.valueOf(seconds); // Last seconds was online
             rows.add(row);
         }
 
