@@ -29,4 +29,4 @@ java Controllers.FireController &
 java Controllers.SprinklerController &
 sleep 1
 
-java Sensors.Fire &
+java Sensors.FireSensor &
