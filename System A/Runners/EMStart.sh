@@ -1,3 +1,4 @@
+cd .. &&
 javac *.java
 javac Sensors/*.java
 killall rmiregistry &

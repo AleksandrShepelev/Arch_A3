@@ -1,5 +1,7 @@
 #!/bin/sh
 
+cd .. &&
+
 echo "Starting ECS Sensors"
 sleep 1
 
