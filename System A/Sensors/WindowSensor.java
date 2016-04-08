@@ -66,7 +66,7 @@ public class WindowSensor extends BaseSensor {
     protected void afterHandle() {
         //if window is broken then repeat it BREAK_DURATION times and randomize according to probability, otherwise randomize
         if (_currentWindowState == true) {
-            if (_currentDuration >= BREAK_DURATION-1) {
+            if (_currentDuration >= BREAK_DURATION) {
                 _currentDuration = 0;
                 _currentWindowState = probablisticCoinToss(EVENT_PROBABILITY);
             } else {
