@@ -1,4 +1,4 @@
 #!/bin/sh
 
 echo "ECS Monitoring Console"
-java ECSConsole
+java Monitors.ECSConsole

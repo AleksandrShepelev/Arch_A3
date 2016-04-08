@@ -16,9 +16,22 @@ abstract class BaseComponent
     protected MessageManagerInterface _em = null;   // Interface object to the message manager
     protected MessageWindow _mw = null;
 
+    public String getManagerAddress() {
+        return managerAddress;
+    }
+
+    private String managerAddress;
+
     BaseComponent(String args[])
     {
         parseArguments(args);
+    }
+
+    BaseComponent() {}
+
+    protected int getSleepDelay()
+    {
+        return SLEEP_DELAY;
     }
 
     private void parseArguments(String args[])
@@ -33,6 +46,7 @@ abstract class BaseComponent
                 // message manager is on the local system
                 System.out.println("\n\nAttempting to register on the local machine..." );
                 _em = new MessageManagerInterface();
+                managerAddress = "127.0.0.1";
 
             } else {
 
@@ -43,6 +57,7 @@ abstract class BaseComponent
                 // Here we create an message manager interface object. This assumes
                 // that the message manager is NOT on the local machine
                 _em = new MessageManagerInterface(address);
+                managerAddress = address;
 
             }
         } catch (Exception e) {
@@ -50,8 +65,7 @@ abstract class BaseComponent
         }
     }
 
-
-    protected void run()
+    protected void execute()
     {
         if (_em == null) {
             System.out.println("Unable to register with the message manager.\n\n" );
@@ -117,7 +131,7 @@ abstract class BaseComponent
                 afterHandle();
 
                 // Here we wait for a 2.5 seconds before we start the next sample
-                Thread.sleep(SLEEP_DELAY);
+                Thread.sleep(getSleepDelay());
 
             } catch (Exception e) {
                 _mw.WriteMessage("An error occurred:: " + e);

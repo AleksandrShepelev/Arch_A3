@@ -15,7 +15,7 @@ public class TemperatureSensor extends BaseSensor
     public static void main(String args[])
     {
         TemperatureSensor sensor = new TemperatureSensor(args);
-        sensor.run();
+        sensor.execute();
     }
 
     protected TemperatureSensor(String[] args)

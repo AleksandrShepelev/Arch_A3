@@ -35,7 +35,7 @@ public class HumiditySensor extends BaseSensor
 	public static void main(String args[])
 	{
         HumiditySensor sensor = new HumiditySensor(args);
-        sensor.run();
+        sensor.execute();
 	} // main
 
 	@Override
