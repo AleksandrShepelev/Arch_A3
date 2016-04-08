@@ -149,7 +149,8 @@ abstract class BaseComponent
                 Thread.sleep(getSleepDelay());
 
             } catch (Exception e) {
-                _mw.WriteMessage("An error occurred:: " + e.getStackTrace());
+                _mw.WriteMessage("An error occurred");
+                e.printStackTrace();
             }
         }
     }
