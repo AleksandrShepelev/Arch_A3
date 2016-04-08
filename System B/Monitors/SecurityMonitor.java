@@ -17,6 +17,7 @@ class SecurityMonitor extends BaseMonitor {
     private boolean _isDoorBroken;
     private boolean _isMotionDetected;
     private boolean _previousAlarmingState;
+    private boolean _isOnFire;
 
     private HashMap <Long, StoredMessage> _messageStorage = new HashMap<>();
 
@@ -61,15 +62,26 @@ class SecurityMonitor extends BaseMonitor {
             case MessageProtocol.Type.MOTION:
                 handleMotion(msg);
                 break;
+            case MessageProtocol.Type.FIRE:
+                handleFire(msg);
+                break;
             case MessageProtocol.Type.ACKNOWLEDGEMENT:
                 handleAcknowledgement(msg);
+                break;
+        }
+    }
+
+    private void handleFire(TimeMessage msg) {
+        if(msg.getMessageText().equalsIgnoreCase(MessageProtocol.Body.FIRE)){
+            _isOnFire = true;
+        }else {
+            _isOnFire = false;
         }
     }
 
     private void handleAcknowledgement(TimeMessage msg) {
         long key = Long.parseLong(msg.getMessageText());
         _messageStorage.remove(key);
-
     }
 
     private void handleWindow(TimeMessage msg) {
@@ -112,7 +124,6 @@ class SecurityMonitor extends BaseMonitor {
         _messageStorage.forEach((aLong, storedMessage) -> storedMessage.incAge()); //incrementing age
 
         HashMap<Long, StoredMessage> clonedObj = (HashMap<Long, StoredMessage>) _messageStorage.clone();
-
 
         _messageStorage.forEach((key, message) -> {
             if(message.Age > AGE_LIMIT){

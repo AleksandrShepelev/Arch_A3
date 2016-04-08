@@ -67,6 +67,9 @@ public class MessageProtocol
         public static final String DOOR_OK = "D0"; // ...
         public static final String MOTION_DETECTED = "M1"; // ...
         public static final String MOTION_OK = "M0"; // ...
+
+        public static final String FIRE = "1";
+        public static final String NO_FIRE = "0";
     }
 
 }
