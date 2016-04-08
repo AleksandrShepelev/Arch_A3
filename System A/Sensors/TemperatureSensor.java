@@ -2,7 +2,7 @@ package Sensors;
 
 import Framework.BaseSensor;
 import Framework.MessageProtocol;
-import MessagePackage.*;
+import Framework.TimeMessage;
 
 public class TemperatureSensor extends BaseSensor
 {
@@ -56,7 +56,7 @@ public class TemperatureSensor extends BaseSensor
         _mw.WriteMessage("   Drift Value Set:: " + _driftValue );
     }
 
-    private void handleAdjustTemperature(Message msg)
+    private void handleAdjustTemperature(TimeMessage msg)
     {
         switch (msg.GetMessage().toUpperCase()) {
             case MessageProtocol.Body.HEATER_ON:
@@ -77,7 +77,7 @@ public class TemperatureSensor extends BaseSensor
     }
 
     @Override
-    protected void handleMessage(Message msg)
+    protected void handleMessage(TimeMessage msg)
     {
         if (msg.GetMessageId() == MessageProtocol.Type.ADJUST_TEMPERATURE) {
             handleAdjustTemperature(msg);
@@ -88,11 +88,11 @@ public class TemperatureSensor extends BaseSensor
     protected void beforeHandle()
     {
         // Here we create the message.
-        Message msg = new Message(MessageProtocol.Type.TEMPERATURE, String.valueOf(_currentTemperature));
+        TimeMessage msg = new TimeMessage(MessageProtocol.Type.TEMPERATURE, String.valueOf(_currentTemperature));
 
         // Here we send the message to the message manager.
         try {
-            _em.SendMessage(msg);
+            _em.SendMessage(msg.getMessage());
             _mw.WriteMessage("Current Temperature::  " + _currentTemperature + " F");
 
         } catch (Exception e) {

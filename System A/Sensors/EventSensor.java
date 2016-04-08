@@ -2,6 +2,7 @@ package Sensors;
 
 import Framework.BaseSensor;
 import Framework.MessageProtocol;
+import Framework.TimeMessage;
 import MessagePackage.Message;
 
 /**
@@ -49,11 +50,11 @@ public abstract class EventSensor extends BaseSensor {
     @Override
     protected void beforeHandle() {
         // Here we create the message.
-        Message msg = new Message(_messageType, String.valueOf(_currentState));
+        TimeMessage msg = new TimeMessage(_messageType, String.valueOf(_currentState));
 
         // Here we send the message to the message manager.
         try {
-            _em.SendMessage(msg);
+            _em.SendMessage(msg.getMessage());
             _mw.WriteMessage("Current "+ getName() +" State::  " + _currentState);
 
         } catch (Exception e) {

@@ -2,7 +2,7 @@ package Sensors;
 
 import Framework.BaseSensor;
 import Framework.MessageProtocol;
-import MessagePackage.*;
+import Framework.TimeMessage;
 
 public class HumiditySensor extends BaseSensor
 {
@@ -56,7 +56,7 @@ public class HumiditySensor extends BaseSensor
 		return 0.60f;
 	}
 
-    private void handleAdjustHumidity(Message msg)
+    private void handleAdjustHumidity(TimeMessage msg)
     {
         switch (msg.GetMessage().toUpperCase()) {
             case MessageProtocol.Body.HUMIDIFIER_ON:
@@ -77,7 +77,7 @@ public class HumiditySensor extends BaseSensor
     }
 
     @Override
-    protected void handleMessage(Message msg)
+    protected void handleMessage(TimeMessage msg)
     {
         if (msg.GetMessageId() == MessageProtocol.Type.ADJUST_HUMIDITY) {
             handleAdjustHumidity(msg);
@@ -88,11 +88,11 @@ public class HumiditySensor extends BaseSensor
 	protected void beforeHandle()
     {
         // Here we create the message.
-        Message msg = new Message(MessageProtocol.Type.HUMIDITY, String.valueOf(_relativeHumidity));
+        TimeMessage msg = new TimeMessage(MessageProtocol.Type.HUMIDITY, String.valueOf(_relativeHumidity));
 
         // Here we send the message to the message manager.
         try {
-            _em.SendMessage(msg);
+            _em.SendMessage(msg.getMessage());
             _mw.WriteMessage("Current Humidity::  " + _relativeHumidity + " %");
 
         } catch (Exception e) {

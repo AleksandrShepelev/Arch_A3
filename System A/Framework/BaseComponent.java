@@ -90,7 +90,7 @@ abstract class BaseComponent
     }
 
     // not all sensors will handle the messages
-    protected void handleMessage(Message msg){}
+    protected void handleMessage(TimeMessage msg){}
 
     private void initMessageWindow()
     {
@@ -102,6 +102,7 @@ abstract class BaseComponent
     {
         Message msg;				// Message object
         MessageQueue eq;			// Message Queue
+        TimeMessage timeMessage;
 
         boolean done = false;			// Loop termination flag
 
@@ -125,14 +126,15 @@ abstract class BaseComponent
                 for ( int i = 0; i < qLen; i++ ) {
 
                     msg = eq.GetMessage();
+                    timeMessage = new TimeMessage(msg);
 
-                    handleMessage(msg);
+                    handleMessage(timeMessage);
 
                     // If the message ID == 99 then this is a signal that the simulation
                     // is to end. At this point, the loop termination flag is set to
                     // true and this process unregisters from the message manager.
 
-                    if (msg.GetMessageId() == MessageProtocol.Type.TERMINATE ) {
+                    if (timeMessage.GetMessageId() == MessageProtocol.Type.TERMINATE ) {
                         done = true;
                         _em.UnRegister();
                         _mw.WriteMessage("\n\nSimulation Stopped. \n");
