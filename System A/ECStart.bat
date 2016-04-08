@@ -7,6 +7,8 @@ START "MUSEUM ENVIRONMENTAL CONTROL SYSTEM CONSOLE" /NORMAL java Monitors.ECSCon
 START "TEMPERATURE CONTROLLER CONSOLE" /MIN /NORMAL java Controllers.TemperatureController %1
 %ECHO Starting Humidity Controller Console
 START "HUMIDITY CONTROLLER CONSOLE" /MIN /NORMAL java Controllers.HumidityController %1
+%ECHO Starting Security Controller Console
+START "SECURITY CONTROLLER CONSOLE" /MIN /NORMAL java Controllers.SecurityController %1
 %ECHO Starting Temperature Sensor Console
 START "TEMPERATURE SENSOR CONSOLE" /MIN /NORMAL java Sensors.TemperatureSensor %1
 %ECHO Starting Humidity Sensor Console
