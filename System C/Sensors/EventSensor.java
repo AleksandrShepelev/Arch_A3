@@ -3,17 +3,18 @@ package Sensors;
 import Framework.BaseSensor;
 import Framework.TimeMessage;
 
-abstract class EventSensor extends BaseSensor {
-    private boolean _currentState = false; //state of sensor: false - usual situation, true - alarm situation
-    private int _messageType; //type of message
+public abstract class EventSensor extends BaseSensor {
+    protected boolean _currentState = false; //state of sensor: false - usual situation, true - alarm situation
+    protected int _messageType; //type of message
     /*
     constants for simulation
      */
-    private static final float EVENT_PROBABILITY = 0.05f; //probability that door will be opened
-    private static final float BREAK_DURATION = 4; //if door is broken, we will repeat this message (BREAK_DURATION times + 1).
-    private int _currentDuration = 0; //counter for repeated messages (See previous option)
+    protected static final float EVENT_PROBABILITY = 0.05f; //probability that door will be opened
+    protected static final float BREAK_DURATION = 4; //if door is broken, we will repeat this message (BREAK_DURATION times + 1).
+    protected int _currentDuration = 0; //counter for repeated messages (See previous option)
 
-    EventSensor(String[] args, int messageType) {
+
+    protected EventSensor(String[] args, int messageType) {
         super(args);
         _messageType = messageType;
     }
@@ -45,7 +46,11 @@ abstract class EventSensor extends BaseSensor {
     @Override
     protected void beforeHandle() {
         // Here we create the message.
-        TimeMessage msg = new TimeMessage(_messageType, String.valueOf(_currentState));
+        int msgText=0;
+        if (_currentState)
+            msgText = 1;
+
+        TimeMessage msg = new TimeMessage(_messageType, String.valueOf(msgText));
 
         // Here we send the message to the message manager.
         try {
