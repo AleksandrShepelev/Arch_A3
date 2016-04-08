@@ -93,10 +93,6 @@ class SecurityMonitor extends BaseMonitor {
         sendAlarmState();
     }
 
-    String getArmedStateAsString() {
-        return isArmed() ? "ARMED" : "DISARMED";
-    }
-
     private void sendAlarmState() {
         TimeMessage msg;
         String body;
@@ -108,7 +104,7 @@ class SecurityMonitor extends BaseMonitor {
                 : MessageProtocol.Body.SECURITY_ALARM_OFF;
         msg = new TimeMessage(MessageProtocol.Type.SECURITY_ALARM, body);
 
-        _ai.SetLampColorAndMessage(getArmedStateAsString(), 3);
+        _ai.SetLampColorAndMessage("PUT RIGHT MESSAGE HERE", 3);
 
         try {
             _em.SendMessage(msg.getMessage());
