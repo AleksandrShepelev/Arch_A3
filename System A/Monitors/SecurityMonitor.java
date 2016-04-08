@@ -7,9 +7,10 @@ import InstrumentationPackage.Indicator;
 
 class SecurityMonitor extends BaseMonitor {
 
-    private boolean _armed = true;
     private Indicator _ai;
-    private Boolean _isWindowBroken;
+
+    private boolean _armed = true;
+    private boolean _isWindowBroken;
     private boolean _isDoorBroken;
     private boolean _isMotionDetected;
 
@@ -57,33 +58,32 @@ class SecurityMonitor extends BaseMonitor {
         }
     }
 
-
     private void handleWindow(TimeMessage msg) {
-        if (msg.getMessageText().equals(MessageProtocol.Body.WINDOW_BROKEN)) {
+        if (msg.getMessageText().equalsIgnoreCase(MessageProtocol.Body.WINDOW_BROKEN)) {
             _isWindowBroken = true;
         }
 
-        if (msg.getMessageText().equals(MessageProtocol.Body.WINDOW_OK)) {
+        if (msg.getMessageText().equalsIgnoreCase(MessageProtocol.Body.WINDOW_OK)) {
             _isWindowBroken = false;
         }
     }
 
     private void handleDoor(TimeMessage msg) {
-        if (msg.getMessageText().equals(MessageProtocol.Body.DOOR_BROKEN)) {
+        if (msg.getMessageText().equalsIgnoreCase(MessageProtocol.Body.DOOR_BROKEN)) {
             _isDoorBroken = true;
         }
 
-        if (msg.getMessageText().equals(MessageProtocol.Body.DOOR_OK)) {
+        if (msg.getMessageText().equalsIgnoreCase(MessageProtocol.Body.DOOR_OK)) {
             _isDoorBroken = false;
         }
     }
 
     private void handleMotion(TimeMessage msg) {
-        if (msg.getMessageText().equals(MessageProtocol.Body.MOTION_DETECTED)) {
+        if (msg.getMessageText().equalsIgnoreCase(MessageProtocol.Body.MOTION_DETECTED)) {
             _isMotionDetected = true;
         }
 
-        if (msg.getMessageText().equals(MessageProtocol.Body.MOTION_OK)) {
+        if (msg.getMessageText().equalsIgnoreCase(MessageProtocol.Body.MOTION_OK)) {
             _isMotionDetected = false;
         }
     }

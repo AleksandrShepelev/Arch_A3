@@ -18,9 +18,13 @@ public class SecurityConsole extends BaseConsole {
     }
 
     public static void main(String args[]) {
-        SecurityConsole console = new SecurityConsole();
-        console.initMonitor(args);
-        console.execute();
+        try {
+            SecurityConsole console = new SecurityConsole();
+            console.initMonitor(args);
+            console.execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void handleSecurityState() {
