@@ -44,7 +44,7 @@ public class WindowSensor extends BaseSensor {
 
     public static void main(String args[]) {
         WindowSensor sensor = new WindowSensor(args);
-        sensor.run();
+        sensor.execute();
     }
 
     @Override
@@ -68,12 +68,12 @@ public class WindowSensor extends BaseSensor {
         if (_currentWindowState == true) {
             if (_currentDuration >= BREAK_DURATION) {
                 _currentDuration = 0;
-                _currentWindowState = probablisticCoinToss(EVENT_PROBABILITY);
+                _currentWindowState = probabilisticCoinToss(EVENT_PROBABILITY);
             } else {
                 _currentDuration++;
             }
         } else {
-            _currentWindowState = probablisticCoinToss(EVENT_PROBABILITY);
+            _currentWindowState = probabilisticCoinToss(EVENT_PROBABILITY);
         }
 
     }

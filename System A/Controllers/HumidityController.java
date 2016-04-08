@@ -30,7 +30,7 @@ public class HumidityController extends BaseController {
 
     public static void main(String args[]) {
         HumidityController controller = new HumidityController(args);
-        controller.run();
+        controller.execute();
     } // main
 
     private void adjustHumidity(String m) {

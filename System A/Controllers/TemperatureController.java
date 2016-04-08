@@ -34,7 +34,7 @@ public class TemperatureController extends BaseController
     public static void main(String args[])
 	{
         TemperatureController controller = new TemperatureController(args);
-        controller.run();
+        controller.execute();
 	}
 
 	private void adjustTemperature(String m)
