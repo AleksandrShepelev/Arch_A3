@@ -46,7 +46,11 @@ public abstract class EventSensor extends BaseSensor {
     @Override
     protected void beforeHandle() {
         // Here we create the message.
-        TimeMessage msg = new TimeMessage(_messageType, String.valueOf(_currentState));
+        int msgText=0;
+        if (_currentState)
+            msgText = 1;
+
+        TimeMessage msg = new TimeMessage(_messageType, String.valueOf(msgText));
 
         // Here we send the message to the message manager.
         try {
