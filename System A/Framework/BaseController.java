@@ -32,7 +32,6 @@ abstract public class BaseController extends BaseComponent
     public void handleMessage(TimeMessage msg)
     {
         if(msg.GetMessageId() == _typeOfMessage){
-            handleDeviceOutput(msg);
             sendAcknowledgement(handleDeviceOutput(msg));
         }
     }
