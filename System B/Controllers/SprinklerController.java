@@ -45,15 +45,16 @@ public class SprinklerController extends BaseController {
             case MessageProtocol.Body.SPRINKLER_ON:
                 _sprinklerState = true;
                 _mw.WriteMessage("Security alarm is turned on!");
-                return MessageProtocol.Body.ACK_SPRINKLER_ON;
+                break;
             case MessageProtocol.Body.SPRINKLER_OFF:
                 _sprinklerState = false;
                 _mw.WriteMessage("Security alarm is turned off!");
-                return MessageProtocol.Body.ACK_SPRINKLER_OFF;
+                break;
             default:
                 _mw.WriteMessage("Unexpected message body in Sprinkler controller: " + msgBody);
-                return null;
+                break;
         }
+        return String.valueOf(msg.getTimestamp());
     }
     @Override
     protected String getName() {

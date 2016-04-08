@@ -3,8 +3,8 @@ package Controllers;
 import Framework.BaseController;
 import Framework.MessageProtocol;
 import Framework.TimeMessage;
-import InstrumentationPackage.*;
-import MessagePackage.*;
+import InstrumentationPackage.Indicator;
+import MessagePackage.Message;
 
 public class HumidityController extends BaseController {
     private Indicator _di;
@@ -67,23 +67,24 @@ public class HumidityController extends BaseController {
             case MessageProtocol.Body.HUMIDIFIER_ON:
                 _humidifierState = true;
                 _mw.WriteMessage("Received humidifier on message");
-                return MessageProtocol.Body.ACK_HUMIDIFIER_ON;
+                break;
             case MessageProtocol.Body.HUMIDIFIER_OFF:
                 _humidifierState = false;
                 _mw.WriteMessage("Received humidifier off message");
-                return MessageProtocol.Body.ACK_HUMIDIFIER_OFF;
+                break;
             case MessageProtocol.Body.DEHUMIDIFIER_ON:
                 _dehumidifierState = true;
                 _mw.WriteMessage("Received dehumidifier on message");
-                return MessageProtocol.Body.ACK_DEHUMIDIFIER_ON;
+                break;
             case MessageProtocol.Body.DEHUMIDIFIER_OFF:
                 _dehumidifierState = false;
                 _mw.WriteMessage("Received dehumidifier off message");
-                return MessageProtocol.Body.ACK_DEHUMIDIFIER_OFF;
+                break;
             default:
+                _mw.WriteMessage("Unknown message: " + msg.getMessageText());
         }
         adjustHumidity(msg.getMessageText().toUpperCase());
-        return null;
+        return String.valueOf(msg.getTimestamp());
     }
 
     private void handleHumidifierState() {
