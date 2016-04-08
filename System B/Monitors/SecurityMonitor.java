@@ -2,17 +2,23 @@ package Monitors;
 
 import Framework.BaseMonitor;
 import Framework.MessageProtocol;
+import Framework.StoredMessage;
 import Framework.TimeMessage;
 import InstrumentationPackage.Indicator;
 
+import java.util.HashMap;
+
 class SecurityMonitor extends BaseMonitor {
 
+    public static final int AGE_LIMIT = 10;
     private Indicator _ai;
-
     private boolean _armed = true;
     private boolean _isWindowBroken;
     private boolean _isDoorBroken;
     private boolean _isMotionDetected;
+    private boolean _previousAlarmingState;
+
+    private HashMap <Long, StoredMessage> _messageStorage = new HashMap<>();
 
     SecurityMonitor(String[] args) {
         super(args);
@@ -20,7 +26,7 @@ class SecurityMonitor extends BaseMonitor {
 
     @Override
     protected void messageWindowAfterCreate() {
-        _ai = new Indicator("ARMED", _mw.GetX() + _mw.Width(), 0);
+        _ai = new Indicator("NO ALARM", _mw.GetX() + _mw.Width(), 0);
     }
 
     @Override
@@ -55,7 +61,15 @@ class SecurityMonitor extends BaseMonitor {
             case MessageProtocol.Type.MOTION:
                 handleMotion(msg);
                 break;
+            case MessageProtocol.Type.ACKNOWLEDGEMENT:
+                handleAcknowledgement(msg);
         }
+    }
+
+    private void handleAcknowledgement(TimeMessage msg) {
+        long key = Long.parseLong(msg.getMessageText());
+        _messageStorage.remove(key);
+
     }
 
     private void handleWindow(TimeMessage msg) {
@@ -90,33 +104,65 @@ class SecurityMonitor extends BaseMonitor {
 
     @Override
     protected void afterHandle() {
-        sendAlarmState();
+        sendAlarmStateToController();
+        resendNotDeliveredMessages();
     }
 
-    private void sendAlarmState() {
-        TimeMessage msg;
+    private void resendNotDeliveredMessages() {
+        _messageStorage.forEach((aLong, storedMessage) -> storedMessage.incAge()); //incrementing age
+
+        HashMap<Long, StoredMessage> clonedObj = (HashMap<Long, StoredMessage>) _messageStorage.clone();
+
+
+        _messageStorage.forEach((key, message) -> {
+            if(message.Age > AGE_LIMIT){
+                System.out.println("Lost message repeated " + message.Message.GetMessage());
+                sendMessage(new TimeMessage(message.Message));
+                clonedObj.remove(key);
+            }});
+
+        _messageStorage = clonedObj;
+    }
+
+    private void sendAlarmStateToController() {
         String body;
         boolean isSecured = !_isWindowBroken && !_isDoorBroken && !_isMotionDetected;
-        boolean isAlarming = _armed && isSecured;
+        boolean isAlarming = _armed && !isSecured;
+
+        if(isAlarming == _previousAlarmingState){
+            return;
+        }
+
+        _previousAlarmingState = isAlarming;
         _mw.WriteMessage(isAlarming ? "Turning on the alarm" : "Turning off the alarm");
 
         body = isAlarming
                 ? MessageProtocol.Body.SECURITY_ALARM_ON
                 : MessageProtocol.Body.SECURITY_ALARM_OFF;
-        msg = new TimeMessage(MessageProtocol.Type.SECURITY_ALARM, body);
+
+        TimeMessage timeMsg = new TimeMessage(MessageProtocol.Type.SECURITY_ALARM, body);
+
         String displayMsg = !_armed
                                 ? "DISARMED"
                                 : isSecured
                                     ? "NO ALARM"
                                     : "ALARM";
+        int color = isAlarming ? 3 : 0;
 
-        _ai.SetLampColorAndMessage(displayMsg, 3);
+        _ai.SetLampColorAndMessage(displayMsg, color);
 
+        sendMessage(timeMsg);
+
+    }
+
+    private void sendMessage(TimeMessage timeMsg) {
         try {
-            _em.SendMessage(msg.getMessage());
+            _em.SendMessage(timeMsg.getMessage());
         } catch (Exception e) {
             System.out.println("Error sending Security alarm control message:: " + e);
         }
+        _messageStorage.put(timeMsg.getTimestamp(), new StoredMessage(timeMsg.getMessage()));
+
     }
 
     void setArmedState(boolean armed) {

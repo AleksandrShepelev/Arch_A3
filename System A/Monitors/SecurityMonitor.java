@@ -5,18 +5,19 @@ import Framework.MessageProtocol;
 import Framework.StoredMessage;
 import Framework.TimeMessage;
 import InstrumentationPackage.Indicator;
-import MessagePackage.Message;
 
 import java.util.HashMap;
 
 class SecurityMonitor extends BaseMonitor {
 
+    public static final int AGE_LIMIT = 10;
     private Indicator _ai;
-
     private boolean _armed = true;
     private boolean _isWindowBroken;
     private boolean _isDoorBroken;
     private boolean _isMotionDetected;
+    private boolean _previousAlarmingState;
+
     private HashMap <Long, StoredMessage> _messageStorage = new HashMap<>();
 
     SecurityMonitor(String[] args) {
@@ -25,7 +26,7 @@ class SecurityMonitor extends BaseMonitor {
 
     @Override
     protected void messageWindowAfterCreate() {
-        _ai = new Indicator("ARMED", _mw.GetX() + _mw.Width(), 0);
+        _ai = new Indicator("NO ALARM", _mw.GetX() + _mw.Width(), 0);
     }
 
     @Override
@@ -103,26 +104,36 @@ class SecurityMonitor extends BaseMonitor {
 
     @Override
     protected void afterHandle() {
-        sendAlarmState();
-        updateMessagesAge();
+        sendAlarmStateToController();
+        resendNotDeliveredMessages();
     }
 
-    private void updateMessagesAge() {
-        _messageStorage.forEach((aLong, storedMessage) -> storedMessage.incAge());
-        HashMap<Long, StoredMessage> clonedObj = (HashMap<Long, StoredMessage>)_messageStorage.clone();
+    private void resendNotDeliveredMessages() {
+        _messageStorage.forEach((aLong, storedMessage) -> storedMessage.incAge()); //incrementing age
+
+        HashMap<Long, StoredMessage> clonedObj = (HashMap<Long, StoredMessage>) _messageStorage.clone();
+
+
         _messageStorage.forEach((key, message) -> {
-            if(message.Age > 10){
+            if(message.Age > AGE_LIMIT){
                 System.out.println("Lost message repeated " + message.Message.GetMessage());
                 sendMessage(new TimeMessage(message.Message));
                 clonedObj.remove(key);
             }});
+
         _messageStorage = clonedObj;
     }
 
-    private void sendAlarmState() {
+    private void sendAlarmStateToController() {
         String body;
         boolean isSecured = !_isWindowBroken && !_isDoorBroken && !_isMotionDetected;
         boolean isAlarming = _armed && !isSecured;
+
+        if(isAlarming == _previousAlarmingState){
+            return;
+        }
+
+        _previousAlarmingState = isAlarming;
         _mw.WriteMessage(isAlarming ? "Turning on the alarm" : "Turning off the alarm");
 
         body = isAlarming
@@ -136,8 +147,9 @@ class SecurityMonitor extends BaseMonitor {
                                 : isSecured
                                     ? "NO ALARM"
                                     : "ALARM";
+        int color = isAlarming ? 3 : 0;
 
-        _ai.SetLampColorAndMessage(displayMsg, 3);
+        _ai.SetLampColorAndMessage(displayMsg, color);
 
         sendMessage(timeMsg);
 
