@@ -44,7 +44,7 @@ public class WindowSensor extends BaseSensor {
 
     public static void main(String args[]) {
         WindowSensor sensor = new WindowSensor(args);
-        sensor.run();
+        sensor.execute();
     }
 
     @Override
