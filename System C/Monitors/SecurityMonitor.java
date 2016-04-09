@@ -10,11 +10,11 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
-enum SprinklerState {ON, WAIT, OFF };
+enum SprinklerState {ON, WAIT, OFF }
 
 class SecurityMonitor extends BaseMonitor {
 
-    public static final int AGE_LIMIT = 10;
+    private static final int AGE_LIMIT = 10;
     private Indicator _ai;
     private boolean _armed = true;
     private boolean _isWindowBroken;
@@ -28,7 +28,7 @@ class SecurityMonitor extends BaseMonitor {
 
 
     private Timer timer = new Timer("Sprinkler timer");
-    TimerTask timerTask;
+    private TimerTask timerTask;
     private int secToRunSprinkler = 10;
 
     private HashMap <Long, StoredMessage> _messageStorage = new HashMap<>();
@@ -237,7 +237,7 @@ class SecurityMonitor extends BaseMonitor {
     }
 
     void turnOnTheSprinkler() {
-        sprinklerState = sprinklerState.ON;
+        sprinklerState = SprinklerState.ON;
         System.out.println("Sprinkler is turned on. Enter TO to turn off the sprinkler");
         _isSprinklerOn = true;
         sendSprinklerStateToController();
@@ -246,13 +246,13 @@ class SecurityMonitor extends BaseMonitor {
     }
 
     void cancelSprinkler() {
-        sprinklerState = sprinklerState.OFF;
+        sprinklerState = SprinklerState.OFF;
         timerTask.cancel();
         secToRunSprinkler=10;
     }
 
     void turnOffTheSprinkler() {
-        sprinklerState = sprinklerState.OFF;
+        sprinklerState = SprinklerState.OFF;
         _isSprinklerOn = false;
         sendSprinklerStateToController();
     }
