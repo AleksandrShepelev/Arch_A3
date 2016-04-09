@@ -36,6 +36,9 @@ public class MessageProtocol
         public static final int SPRINKLER = 22; //
         public static final int FIRE_ALARM = 23; //
 
+        // special message for silent controller which don't flood every time
+        public static final int HEART_BEAT = 100;
+
     }
 
     public static final class Body
@@ -83,6 +86,8 @@ public class MessageProtocol
         public static final String REG_SECURITY_CONTROLLER = "SC";
         public static final String REG_FIRE_CONTROLLER = "FC";
         public static final String REG_SPRINKLER_CONTROLLER = "SPC";
+
+        public static final String REG_EVERYONE = "ALL"; // message for registering all parties
 
 
     }

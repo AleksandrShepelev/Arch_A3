@@ -8,6 +8,10 @@ package Framework;
 abstract public class BaseController extends BaseComponent
 {
     private int _typeOfMessage;
+    protected boolean _isSilent = false;
+
+    private static final int HEART_BEAT_DELAY = 7; // send only every X seconds for performance
+    private long _lastHeartBeat = 0;
 
     protected BaseController(String[] args, int typeOfMessage) {
         super(args);
@@ -33,6 +37,31 @@ abstract public class BaseController extends BaseComponent
     {
         if(msg.GetMessageId() == _typeOfMessage){
             sendAcknowledgement(handleDeviceOutput(msg));
+        }
+    }
+
+    @Override
+    public void beforeHandle() {
+        if (!_isSilent) {
+            return;
+        }
+
+        // don't flood very ofter
+        if ((System.currentTimeMillis() - _lastHeartBeat) / 1000 < HEART_BEAT_DELAY) {
+            return;
+        }
+
+        _lastHeartBeat = System.currentTimeMillis();
+
+        // Here we create the message.
+        TimeMessage msg = new TimeMessage(MessageProtocol.Type.HEART_BEAT, getRegistrationMessage());
+
+        // Here we send the message to the message manager.
+        try {
+            _em.SendMessage(msg.getMessage());
+            _mw.WriteMessage("Sent heart beat...");
+        } catch (Exception e) {
+            System.out.println("Error Confirming Message:: " + e);
         }
     }
 }

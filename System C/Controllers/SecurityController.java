@@ -12,6 +12,7 @@ public class SecurityController extends BaseController{
     private Indicator _ai;
     private SecurityController(String[] args) {
         super(args,MessageProtocol.Type.SECURITY_ALARM);
+        _isSilent = true;
     }
 
     public static void main(String args[])
