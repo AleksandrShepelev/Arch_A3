@@ -6,22 +6,20 @@ import Framework.StoredMessage;
 import Framework.TimeMessage;
 import InstrumentationPackage.Indicator;
 
-import java.util.HashMap;
 
 
 
 
 class SecurityMonitor extends BaseMonitor {
 
-    public static final int AGE_LIMIT = 10;
-    private Indicator _ai;
+    private Indicator _secAlarmIndicator;
     private boolean _armed = true;
     private boolean _isWindowBroken;
     private boolean _isDoorBroken;
     private boolean _isMotionDetected;
-    private boolean _previousSecurityAlarmState;
+    private String _previousSecurityAlarmState;
 
-    private HashMap <Long, StoredMessage> _messageStorage = new HashMap<>();
+
 
     SecurityMonitor(String[] args) {
         super(args);
@@ -29,12 +27,12 @@ class SecurityMonitor extends BaseMonitor {
 
     @Override
     protected void messageWindowAfterCreate() {
-        _ai = new Indicator("NO ALARM", _mw.GetX() + _mw.Width(), 0);
+        _secAlarmIndicator = new Indicator("NO SEC ALARM", _mw.GetX(), _mw.Width(), 0);
     }
 
     @Override
     protected void unload() {
-        _ai.dispose();
+        _secAlarmIndicator.dispose();
     }
 
     @Override
@@ -64,14 +62,8 @@ class SecurityMonitor extends BaseMonitor {
             case MessageProtocol.Type.MOTION:
                 handleMotion(msg);
                 break;
-            case MessageProtocol.Type.ACKNOWLEDGEMENT:
-                handleAcknowledgement(msg);
         }
-    }
-
-    private void handleAcknowledgement(TimeMessage msg) {
-        long key = Long.parseLong(msg.getMessageText());
-        _messageStorage.remove(key);
+        super.handleMessage(msg);
     }
 
     private void handleWindow(TimeMessage msg) {
@@ -107,22 +99,7 @@ class SecurityMonitor extends BaseMonitor {
     @Override
     protected void afterHandle() {
         sendSecurityAlarmState();
-        resendNotDeliveredMessages();
-    }
-
-    private void resendNotDeliveredMessages() {
-        _messageStorage.forEach((aLong, storedMessage) -> storedMessage.incAge()); //incrementing age
-
-        HashMap<Long, StoredMessage> clonedObj = (HashMap<Long, StoredMessage>) _messageStorage.clone();
-
-        _messageStorage.forEach((key, message) -> {
-            if(message.Age > AGE_LIMIT){
-                System.out.println("Lost message repeated " + message.Message.GetMessage());
-                sendMessage(new TimeMessage(message.Message));
-                clonedObj.remove(key);
-            }});
-
-        _messageStorage = clonedObj;
+        super.afterHandle();
     }
 
     private void sendSecurityAlarmState() {
@@ -130,11 +107,6 @@ class SecurityMonitor extends BaseMonitor {
         boolean isSafetyEnsured = !_isWindowBroken && !_isDoorBroken && !_isMotionDetected;
         boolean isAlarming = _armed && !isSafetyEnsured;
 
-        if(isAlarming == _previousSecurityAlarmState){
-            return;
-        }
-
-        _previousSecurityAlarmState = isAlarming;
         _mw.WriteMessage(isAlarming ? "Turning on the alarm" : "Turning off the alarm");
 
         body = isAlarming
@@ -146,23 +118,18 @@ class SecurityMonitor extends BaseMonitor {
         String displayMsg = !_armed
                                 ? "DISARMED"
                                 : isSafetyEnsured
-                                    ? "NO ALARM"
-                                    : "ALARM";
+                                    ? "NO SEC ALARM"
+                                    : "SEC ALARM";
         int color = isAlarming ? 3 : 0;
-
-        _ai.SetLampColorAndMessage(displayMsg, color);
-
-        sendMessage(timeMsg);
-
-    }
-
-    private void sendMessage(TimeMessage timeMsg) {
-        try {
-            _em.SendMessage(timeMsg.getMessage());
-        } catch (Exception e) {
-            System.out.println("Error sending Security alarm control message:: " + e);
+        if(displayMsg.equalsIgnoreCase(_previousSecurityAlarmState)){
+            return;
         }
-        _messageStorage.put(timeMsg.getTimestamp(), new StoredMessage(timeMsg.getMessage()));
+        _previousSecurityAlarmState = displayMsg;
+
+        _secAlarmIndicator.SetLampColorAndMessage(displayMsg, color);
+
+        _mw.WriteMessage(isAlarming ? "Turning on the security alarm" : "Turning off the security alarm");
+        sendMessage(timeMsg);
 
     }
 

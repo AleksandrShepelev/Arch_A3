@@ -2,11 +2,9 @@ package Monitors;
 
 import Framework.BaseMonitor;
 import Framework.MessageProtocol;
-import Framework.StoredMessage;
 import Framework.TimeMessage;
 import InstrumentationPackage.Indicator;
 
-import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -14,7 +12,6 @@ enum SprinklerState {ON, WAIT, OFF}
 
 class SecurityMonitor extends BaseMonitor {
 
-    public static final int AGE_LIMIT = 10;
     private Indicator _secAlarmIndicator;
     private Indicator _fireAlarmIndicator;
     private Indicator _sprinklerAlarmIndicator;
@@ -34,7 +31,6 @@ class SecurityMonitor extends BaseMonitor {
     TimerTask timerTask;
     private int secToRunSprinkler = 10;
 
-    private HashMap<Long, StoredMessage> _messageStorage = new HashMap<>();
 
     SecurityMonitor(String[] args) {
         super(args);
@@ -84,10 +80,8 @@ class SecurityMonitor extends BaseMonitor {
             case MessageProtocol.Type.FIRE:
                 handleFire(msg);
                 break;
-            case MessageProtocol.Type.ACKNOWLEDGEMENT:
-                handleAcknowledgement(msg);
-                break;
         }
+        super.handleMessage(msg);
     }
 
     private void handleFire(TimeMessage msg) {
@@ -117,10 +111,6 @@ class SecurityMonitor extends BaseMonitor {
         }
     }
 
-    private void handleAcknowledgement(TimeMessage msg) {
-        long key = Long.parseLong(msg.getMessageText());
-        _messageStorage.remove(key);
-    }
 
     private void handleWindow(TimeMessage msg) {
         if (msg.getMessageText().equalsIgnoreCase(MessageProtocol.Body.WINDOW_BROKEN)) {
@@ -156,7 +146,7 @@ class SecurityMonitor extends BaseMonitor {
     protected void afterHandle() {
         sendSecurityAlarmState();
         sendFireAlarmState();
-        resendNotDeliveredMessages();
+        super.afterHandle();
     }
 
     private void sendFireAlarmState() {
@@ -175,22 +165,6 @@ class SecurityMonitor extends BaseMonitor {
             _fireAlarmIndicator.SetLampColorAndMessage("NO FIRE ALARM", 0);
         }
         sendMessage(new TimeMessage(MessageProtocol.Type.FIRE_ALARM, body));
-    }
-
-    private void resendNotDeliveredMessages() {
-        _messageStorage.forEach((aLong, storedMessage) -> storedMessage.incAge()); //incrementing age
-
-        HashMap<Long, StoredMessage> clonedObj = (HashMap<Long, StoredMessage>) _messageStorage.clone();
-
-        _messageStorage.forEach((key, message) -> {
-            if (message.Age > AGE_LIMIT) {
-                System.out.println("Lost message repeated " + message.Message.GetMessage());
-                sendMessage(new TimeMessage(message.Message));
-                clonedObj.remove(key);
-            }
-        });
-
-        _messageStorage = clonedObj;
     }
 
     private void sendSecurityAlarmState() {
@@ -242,15 +216,7 @@ class SecurityMonitor extends BaseMonitor {
         sendMessage(timeMsg);
     }
 
-    private void sendMessage(TimeMessage timeMsg) {
-        try {
-            _em.SendMessage(timeMsg.getMessage());
-        } catch (Exception e) {
-            System.out.println("Error sending Security alarm control message:: " + e);
-        }
-        _messageStorage.put(timeMsg.getTimestamp(), new StoredMessage(timeMsg.getMessage()));
 
-    }
 
     void turnOnTheSprinkler() {
         sprinklerState = SprinklerState.ON;
