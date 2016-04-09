@@ -23,6 +23,7 @@ class SecurityMonitor extends BaseMonitor {
     private boolean _isOnFire;
     private boolean _isSprinklerOn;
 
+
     private Timer timer = new Timer("Sprinkler timer");
     TimerTask timerTask;
     private int secToRunSprinkler = 10;
@@ -92,10 +93,9 @@ class SecurityMonitor extends BaseMonitor {
                 };
                 timer.scheduleAtFixedRate(timerTask, 50, 1000);//start timer in 0ms to increment  counter
             }
-
             if (secToRunSprinkler <= 0)
             {
-                setSprinkerState(true);
+                turnOnTheSprinkler();
             }
             _isOnFire = true;
         }else if(msg.getMessageText().equalsIgnoreCase(MessageProtocol.Body.NO_FIRE)) {
@@ -219,16 +219,6 @@ class SecurityMonitor extends BaseMonitor {
                 : MessageProtocol.Body.SPRINKLER_OFF;
 
         TimeMessage timeMsg = new TimeMessage(MessageProtocol.Type.SPRINKLER, body);
-
-      /*  String displayMsg = !_armed
-                ? "DISARMED"
-                : isSecured
-                ? "NO ALARM"
-                : "ALARM";
-        int color = isAlarming ? 3 : 0;
-
-        _ai.SetLampColorAndMessage(displayMsg, color);*/
-
         sendMessage(timeMsg);
     }
 
@@ -242,12 +232,23 @@ class SecurityMonitor extends BaseMonitor {
 
     }
 
-    void setSprinkerState(boolean state) {
-        _isSprinklerOn = state;
+    void turnOnTheSprinkler() {
+        _isSprinklerOn = true;
         sendSprinklerStateToController();
         timerTask.cancel();
         secToRunSprinkler=10;
     }
+
+    void cancelSprinkler() {
+        timerTask.cancel();
+        secToRunSprinkler=10;
+    }
+
+    void turnOffTheSprinkler() {
+        _isSprinklerOn = false;
+        sendSprinklerStateToController();
+    }
+
 
     void setArmedState(boolean armed) {
         _armed = armed;

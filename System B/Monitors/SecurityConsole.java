@@ -13,7 +13,7 @@ public class SecurityConsole extends BaseConsole {
     private static final String DISARM = "OFF";
     private static final String CONFIRM = "Y";
     private static final String CANCEL = "N";
-
+    private static final String TURN_OFF = "TO";
     @Override
     protected void initMonitor(String[] args) {
         _monitor = new SecurityMonitor(args);
@@ -56,8 +56,13 @@ public class SecurityConsole extends BaseConsole {
         if (option.equals(ARM) || option.equals(DISARM))
             monitor.setArmedState(getNewStateFromUser(monitor.isArmed(), option));
 
-        if (option.equals(CONFIRM) || option.equals(CANCEL))
-            monitor.setSprinkerState(getSprinklerStateFromUser(option));
+        if (option.equals(CONFIRM))
+            monitor.turnOnTheSprinkler();
+        if (option.equals(CANCEL))
+            monitor.cancelSprinkler();
+        if (option.equals(TURN_OFF))
+            monitor.turnOffTheSprinkler();
+
     }
 
     @Override
