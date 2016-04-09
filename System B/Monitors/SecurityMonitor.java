@@ -9,18 +9,22 @@ import InstrumentationPackage.Indicator;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.jar.Pack200;
 
 enum SprinklerState {ON, WAIT, OFF };
 
 class SecurityMonitor extends BaseMonitor {
 
     public static final int AGE_LIMIT = 10;
-    private Indicator _ai;
+    private Indicator _secAlarmIndicator;
+    private Indicator _fireAlarmIndicator;
+    private Indicator _sprinklerAlarmIndicator;
+
     private boolean _armed = true;
     private boolean _isWindowBroken;
     private boolean _isDoorBroken;
     private boolean _isMotionDetected;
-    private boolean _previousSecurityAlarmState;
+    private String _previousSecurityAlarmState;
     private boolean _previousFireAlarmState;
     private boolean _isOnFire;
     private boolean _isSprinklerOn;
@@ -39,12 +43,14 @@ class SecurityMonitor extends BaseMonitor {
 
     @Override
     protected void messageWindowAfterCreate() {
-        _ai = new Indicator("NO ALARM", _mw.GetX() + _mw.Width(), 0);
+        _secAlarmIndicator = new Indicator("NO SEC ALARM", _mw.GetX(), _mw.Width(), 1);
+        _fireAlarmIndicator = new Indicator("NO FIRE ALARM", _mw.GetX(), _mw.Width(), 1);
+        _sprinklerAlarmIndicator = new Indicator("SPRINKLER OFF", _mw.GetX(), _mw.Width(), 0);
     }
 
     @Override
     protected void unload() {
-        _ai.dispose();
+        _secAlarmIndicator.dispose();
     }
 
     @Override
@@ -164,6 +170,11 @@ class SecurityMonitor extends BaseMonitor {
                     ? MessageProtocol.Body.FIRE_ALARM_ON
                     : MessageProtocol.Body.FIRE_ALARM_OFF;
 
+        if(_isOnFire) {
+            _fireAlarmIndicator.SetLampColorAndMessage("FIRE ALARM", 3);
+        }else {
+            _fireAlarmIndicator.SetLampColorAndMessage("NO FIRE ALARM", 1);
+        }
         sendMessage(new TimeMessage(MessageProtocol.Type.FIRE_ALARM, body));
     }
 
@@ -187,13 +198,6 @@ class SecurityMonitor extends BaseMonitor {
         boolean isSafetyEnsured = !_isWindowBroken && !_isDoorBroken && !_isMotionDetected;
         boolean isAlarming = _armed && !isSafetyEnsured;
 
-        if(isAlarming == _previousSecurityAlarmState){
-            return;
-        }
-
-        _previousSecurityAlarmState = isAlarming;
-        _mw.WriteMessage(isAlarming ? "Turning on the alarm" : "Turning off the alarm");
-
         body = isAlarming
                 ? MessageProtocol.Body.SECURITY_ALARM_ON
                 : MessageProtocol.Body.SECURITY_ALARM_OFF;
@@ -203,12 +207,17 @@ class SecurityMonitor extends BaseMonitor {
         String displayMsg = !_armed
                                 ? "DISARMED"
                                 : isSafetyEnsured
-                                    ? "NO ALARM"
-                                    : "ALARM";
+                                    ? "NO SEC ALARM"
+                                    : "SEC ALARM";
         int color = isAlarming ? 3 : 0;
+        if(displayMsg.equalsIgnoreCase(_previousSecurityAlarmState)){
+            return;
+        }
+        _previousSecurityAlarmState = displayMsg;
 
-        _ai.SetLampColorAndMessage(displayMsg, color);
+        _secAlarmIndicator.SetLampColorAndMessage(displayMsg, color);
 
+        _mw.WriteMessage(isAlarming ? "Turning on the security alarm" : "Turning off the security alarm");
         sendMessage(timeMsg);
 
     }
@@ -223,6 +232,11 @@ class SecurityMonitor extends BaseMonitor {
                 : MessageProtocol.Body.SPRINKLER_OFF;
 
         TimeMessage timeMsg = new TimeMessage(MessageProtocol.Type.SPRINKLER, body);
+        if(_isSprinklerOn) {
+            _sprinklerAlarmIndicator.SetLampColorAndMessage("SPRINKLER ON", 1);
+        }else {
+            _sprinklerAlarmIndicator.SetLampColorAndMessage("SPRINKLER OFF", 0);
+        }
         sendMessage(timeMsg);
     }
 
@@ -237,7 +251,7 @@ class SecurityMonitor extends BaseMonitor {
     }
 
     void turnOnTheSprinkler() {
-        sprinklerState = sprinklerState.ON;
+        sprinklerState = SprinklerState.ON;
         System.out.println("Sprinkler is turned on. Enter TO to turn off the sprinkler");
         _isSprinklerOn = true;
         sendSprinklerStateToController();
@@ -246,13 +260,13 @@ class SecurityMonitor extends BaseMonitor {
     }
 
     void cancelSprinkler() {
-        sprinklerState = sprinklerState.OFF;
+        sprinklerState = SprinklerState.OFF;
         timerTask.cancel();
         secToRunSprinkler=10;
     }
 
     void turnOffTheSprinkler() {
-        sprinklerState = sprinklerState.OFF;
+        sprinklerState = SprinklerState.OFF;
         _isSprinklerOn = false;
         sendSprinklerStateToController();
     }

@@ -14,6 +14,7 @@ public class SecurityConsole extends BaseConsole {
     private static final String CONFIRM = "Y";
     private static final String CANCEL = "N";
     private static final String TURN_OFF = "TO";
+    private boolean _wasDisplayed;
     @Override
     protected void initMonitor(String[] args) {
         _monitor = new SecurityMonitor(args);
@@ -32,12 +33,12 @@ public class SecurityConsole extends BaseConsole {
     private boolean getNewStateFromUser(boolean isArmed, String option) {
         String expectedInput;
         expectedInput = isArmed ? DISARM : ARM ;
-        System.out.println("Enter '" + expectedInput + "' to arm the system");
 
         if (option.equals(expectedInput)) {
             return !isArmed;
         }
         else {
+            System.out.println("Enter '" + expectedInput + "' to arm the system");
             return isArmed;
         }
     }
@@ -71,18 +72,22 @@ public class SecurityConsole extends BaseConsole {
 
     @Override
     protected void initStartMenu() {
-        SecurityMonitor monitor = (SecurityMonitor) _monitor;
+        if(!_wasDisplayed) {
+            SecurityMonitor monitor = (SecurityMonitor) _monitor;
 
-        System.out.println("\n\n\n\n");
-        System.out.println("Security Command Console: \n");
-        System.out.println("Using message manger at: " + monitor.getManagerAddress() + "\n");
+            System.out.println("\n\n\n\n");
+            System.out.println("Security Command Console: \n");
+            System.out.println("Using message manger at: " + monitor.getManagerAddress() + "\n");
 
-        System.out.println("Now security is " + getArmedStateAsString() + "\n");
-        System.out.println("Select an Option: \n");
-        System.out.println(ARM + ": Arm the system");
-        System.out.println(DISARM + ": Disarm teh system");
-        System.out.println(STOP_SYSTEM + ": Stop System\n");
-        System.out.print("\n>>>> ");
+            System.out.println("Now security is " + getArmedStateAsString() + "\n");
+            System.out.println("Select an Option: \n");
+            System.out.println(ARM + ": Arm the system");
+            System.out.println(DISARM + ": Disarm teh system");
+            System.out.println(STOP_SYSTEM + ": Stop System\n");
+            System.out.print("\n>>>> ");
+
+            _wasDisplayed = true;
+        }
     }
 
     private String getArmedStateAsString() {
