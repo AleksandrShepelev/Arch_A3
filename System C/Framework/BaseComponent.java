@@ -10,6 +10,9 @@ import MessagePackage.Message;
 import MessagePackage.MessageManagerInterface;
 import MessagePackage.MessageQueue;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 abstract class BaseComponent {
 
     private static final int SLEEP_DELAY = 2500;    // The loop delay (2.5 seconds)
@@ -101,9 +104,13 @@ abstract class BaseComponent {
         messageWindowAfterCreate();
     }
 
+    protected String getRegistrationMessage() {
+        return getType() + TimeMessage.BODY_DELIMETER + getName();
+    }
+
     private void signUp() {
 
-        String body = getType() + TimeMessage.BODY_DELIMETER + getName();
+        String body = getRegistrationMessage();
 
         // Here we create the message.
         TimeMessage msg = new TimeMessage(MessageProtocol.Type.REGISTER_DEVICE, body);
@@ -127,12 +134,18 @@ abstract class BaseComponent {
     }
 
     private boolean checkSignUpRequest(TimeMessage msg) {
-        if (msg.GetMessageId() == MessageProtocol.Type.REGISTER_DEVICE_REQUEST) {
-            _signed = false;
-            _mw.WriteMessage("Registration request accepted");
-            return true;
+        if (msg.GetMessageId() != MessageProtocol.Type.REGISTER_DEVICE_REQUEST) {
+            return false;
         }
-        return false;
+
+        String body = msg.getMessageText().toUpperCase();
+        if (!body.equals(getType()) && !body.equals(MessageProtocol.Body.REG_EVERYONE)) {
+            return false;
+        }
+
+        _signed = false;
+        _mw.WriteMessage("Registration request accepted");
+        return true;
     }
 
     private void handle() {
@@ -207,6 +220,7 @@ abstract class BaseComponent {
 
             } catch (Exception e) {
                 _mw.WriteMessage("An error occurred:: " + e);
+                e.printStackTrace();
             }
         }
     }
