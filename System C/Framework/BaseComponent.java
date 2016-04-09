@@ -124,7 +124,7 @@ abstract class BaseComponent {
     }
 
     private void checkSignUp(TimeMessage msg) {
-        if (msg.GetMessageId() == MessageProtocol.Type.ACKNOWLEDGEMENT &&
+        if (msg.GetMessageId() == MessageProtocol.Type.REGISTER_ACKNOWLEDGEMENT &&
                 msg.getMessageText().toUpperCase().equals(getType())) {
             _signed = true;
             _mw.WriteMessage("Registration done");
