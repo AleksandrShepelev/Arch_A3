@@ -9,9 +9,8 @@ import InstrumentationPackage.Indicator;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.jar.Pack200;
 
-enum SprinklerState {ON, WAIT, OFF};
+enum SprinklerState {ON, WAIT, OFF}
 
 class SecurityMonitor extends BaseMonitor {
 
@@ -43,14 +42,16 @@ class SecurityMonitor extends BaseMonitor {
 
     @Override
     protected void messageWindowAfterCreate() {
-        _secAlarmIndicator = new Indicator("NO SEC ALARM", _mw.GetX(), _mw.Width(), 1);
-        _fireAlarmIndicator = new Indicator("NO FIRE ALARM", _mw.GetX(), _mw.Width(), 1);
+        _secAlarmIndicator = new Indicator("NO SEC ALARM", _mw.GetX(), _mw.Width(), 0);
+        _fireAlarmIndicator = new Indicator("NO FIRE ALARM", _mw.GetX(), _mw.Width(), 0);
         _sprinklerAlarmIndicator = new Indicator("SPRINKLER OFF", _mw.GetX(), _mw.Width(), 0);
     }
 
     @Override
     protected void unload() {
         _secAlarmIndicator.dispose();
+        _fireAlarmIndicator.dispose();
+        _sprinklerAlarmIndicator.dispose();
     }
 
     @Override
@@ -171,7 +172,7 @@ class SecurityMonitor extends BaseMonitor {
         if(_isOnFire) {
             _fireAlarmIndicator.SetLampColorAndMessage("FIRE ALARM", 3);
         }else {
-            _fireAlarmIndicator.SetLampColorAndMessage("NO FIRE ALARM", 1);
+            _fireAlarmIndicator.SetLampColorAndMessage("NO FIRE ALARM", 0);
         }
         sendMessage(new TimeMessage(MessageProtocol.Type.FIRE_ALARM, body));
     }
@@ -197,11 +198,6 @@ class SecurityMonitor extends BaseMonitor {
         boolean isSafetyEnsured = !_isWindowBroken && !_isDoorBroken && !_isMotionDetected;
         boolean isAlarming = _armed && !isSafetyEnsured;
 
-        if (isAlarming == _previousSecurityAlarmState) {
-            return;
-        }
-
-        _previousSecurityAlarmState = isAlarming;
         _mw.WriteMessage(isAlarming ? "Turning on the alarm" : "Turning off the alarm");
 
         body = isAlarming
