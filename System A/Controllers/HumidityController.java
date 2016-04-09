@@ -3,8 +3,8 @@ package Controllers;
 import Framework.BaseController;
 import Framework.MessageProtocol;
 import Framework.TimeMessage;
-import InstrumentationPackage.*;
-import MessagePackage.*;
+import InstrumentationPackage.Indicator;
+import MessagePackage.Message;
 
 public class HumidityController extends BaseController {
     private Indicator _di;

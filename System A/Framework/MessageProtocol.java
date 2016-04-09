@@ -28,7 +28,6 @@ public class MessageProtocol
         public static final int WINDOW = 11; //
         public static final int DOOR = 12; //
         public static final int MOTION = 13; //
-
         public static final int FIRE = 14; //
 
         public static final int SECURITY_ALARM = 21; //
@@ -52,7 +51,6 @@ public class MessageProtocol
         public static final String DEHUMIDIFIER_ON = "D1";
         public static final String DEHUMIDIFIER_OFF = "D0";
 
-
         // new
         public static final String SECURITY_ALARM_ON = "SC1"; // ...
         public static final String SECURITY_ALARM_OFF = "SC0"; // ...
@@ -63,7 +61,6 @@ public class MessageProtocol
         public static final String DOOR_OK = "0"; // ...
         public static final String MOTION_DETECTED = "1"; // ...
         public static final String MOTION_OK = "0"; // ...
-
     }
 
 }

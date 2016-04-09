@@ -16,7 +16,7 @@ class SecurityMonitor extends BaseMonitor {
     private boolean _isWindowBroken;
     private boolean _isDoorBroken;
     private boolean _isMotionDetected;
-    private boolean _previousAlarmingState;
+    private boolean _previousSecurityAlarmState;
 
     private HashMap <Long, StoredMessage> _messageStorage = new HashMap<>();
 
@@ -69,7 +69,6 @@ class SecurityMonitor extends BaseMonitor {
     private void handleAcknowledgement(TimeMessage msg) {
         long key = Long.parseLong(msg.getMessageText());
         _messageStorage.remove(key);
-
     }
 
     private void handleWindow(TimeMessage msg) {
@@ -104,7 +103,7 @@ class SecurityMonitor extends BaseMonitor {
 
     @Override
     protected void afterHandle() {
-        sendAlarmStateToController();
+        sendSecurityAlarmState();
         resendNotDeliveredMessages();
     }
 
@@ -112,7 +111,6 @@ class SecurityMonitor extends BaseMonitor {
         _messageStorage.forEach((aLong, storedMessage) -> storedMessage.incAge()); //incrementing age
 
         HashMap<Long, StoredMessage> clonedObj = (HashMap<Long, StoredMessage>) _messageStorage.clone();
-
 
         _messageStorage.forEach((key, message) -> {
             if(message.Age > AGE_LIMIT){
@@ -124,16 +122,16 @@ class SecurityMonitor extends BaseMonitor {
         _messageStorage = clonedObj;
     }
 
-    private void sendAlarmStateToController() {
+    private void sendSecurityAlarmState() {
         String body;
-        boolean isSecured = !_isWindowBroken && !_isDoorBroken && !_isMotionDetected;
-        boolean isAlarming = _armed && !isSecured;
+        boolean isSafetyEnsured = !_isWindowBroken && !_isDoorBroken && !_isMotionDetected;
+        boolean isAlarming = _armed && !isSafetyEnsured;
 
-        if(isAlarming == _previousAlarmingState){
+        if(isAlarming == _previousSecurityAlarmState){
             return;
         }
 
-        _previousAlarmingState = isAlarming;
+        _previousSecurityAlarmState = isAlarming;
         _mw.WriteMessage(isAlarming ? "Turning on the alarm" : "Turning off the alarm");
 
         body = isAlarming
@@ -144,7 +142,7 @@ class SecurityMonitor extends BaseMonitor {
 
         String displayMsg = !_armed
                                 ? "DISARMED"
-                                : isSecured
+                                : isSafetyEnsured
                                     ? "NO ALARM"
                                     : "ALARM";
         int color = isAlarming ? 3 : 0;

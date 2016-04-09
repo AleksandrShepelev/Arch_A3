@@ -7,6 +7,8 @@ import Framework.TimeMessage;
 import InstrumentationPackage.Indicator;
 
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 class SecurityMonitor extends BaseMonitor {
 
@@ -19,6 +21,11 @@ class SecurityMonitor extends BaseMonitor {
     private boolean _previousSecurityAlarmState;
     private boolean _previousFireAlarmState;
     private boolean _isOnFire;
+    private boolean _isSprinklerOn;
+
+    private Timer timer = new Timer("Sprinkler timer");
+    TimerTask timerTask;
+    private int secToRunSprinkler = 10;
 
     private HashMap <Long, StoredMessage> _messageStorage = new HashMap<>();
 
@@ -74,8 +81,29 @@ class SecurityMonitor extends BaseMonitor {
 
     private void handleFire(TimeMessage msg) {
         if(msg.getMessageText().equalsIgnoreCase(MessageProtocol.Body.FIRE)){
+            if (!_isOnFire) {
+                System.out.println("Fire alarm detected. Enter Y to confirm sprinkler launch or N to cancel. You have "
+                        + secToRunSprinkler + "sec to do it");
+               timerTask = new TimerTask() {
+                    @Override
+                    public void run() {
+                        secToRunSprinkler--;
+                    }
+                };
+                timer.scheduleAtFixedRate(timerTask, 50, 1000);//start timer in 0ms to increment  counter
+            }
+
+            if (secToRunSprinkler <= 0)
+            {
+                setSprinkerState(true);
+            }
             _isOnFire = true;
-        }else {
+        }else if(msg.getMessageText().equalsIgnoreCase(MessageProtocol.Body.NO_FIRE)) {
+
+            if (_isOnFire && _isSprinklerOn) {
+                _isSprinklerOn = false;
+                sendSprinklerStateToController();
+            }
             _isOnFire = false;
         }
     }
@@ -126,7 +154,7 @@ class SecurityMonitor extends BaseMonitor {
         if(_previousFireAlarmState == _isOnFire){
             return;
         }
-
+        _previousFireAlarmState = _isOnFire;
         String body =
                 _isOnFire
                     ? MessageProtocol.Body.FIRE_ALARM_ON
@@ -181,6 +209,29 @@ class SecurityMonitor extends BaseMonitor {
 
     }
 
+    private void sendSprinklerStateToController() {
+        String body;
+
+        _mw.WriteMessage(_isSprinklerOn ? "Turning on the sprinkler" : "Turning off the sprinkler");
+
+        body = _isSprinklerOn
+                ? MessageProtocol.Body.SPRINKLER_ON
+                : MessageProtocol.Body.SPRINKLER_OFF;
+
+        TimeMessage timeMsg = new TimeMessage(MessageProtocol.Type.SPRINKLER, body);
+
+      /*  String displayMsg = !_armed
+                ? "DISARMED"
+                : isSecured
+                ? "NO ALARM"
+                : "ALARM";
+        int color = isAlarming ? 3 : 0;
+
+        _ai.SetLampColorAndMessage(displayMsg, color);*/
+
+        sendMessage(timeMsg);
+    }
+
     private void sendMessage(TimeMessage timeMsg) {
         try {
             _em.SendMessage(timeMsg.getMessage());
@@ -189,6 +240,13 @@ class SecurityMonitor extends BaseMonitor {
         }
         _messageStorage.put(timeMsg.getTimestamp(), new StoredMessage(timeMsg.getMessage()));
 
+    }
+
+    void setSprinkerState(boolean state) {
+        _isSprinklerOn = state;
+        sendSprinklerStateToController();
+        timerTask.cancel();
+        secToRunSprinkler=10;
     }
 
     void setArmedState(boolean armed) {

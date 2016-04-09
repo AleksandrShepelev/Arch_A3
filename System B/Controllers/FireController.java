@@ -1,6 +1,5 @@
 package Controllers;
 
-import Framework.BaseConsole;
 import Framework.BaseController;
 import Framework.MessageProtocol;
 import Framework.TimeMessage;
@@ -41,11 +40,11 @@ public class FireController extends BaseController {
         switch (msgBody) {
             case MessageProtocol.Body.FIRE_ALARM_ON:
                 _fireAlarmState = true;
-                _mw.WriteMessage("Security alarm is turned on!");
+                _mw.WriteMessage("Fire alarm is turned on!");
                 break;
             case MessageProtocol.Body.FIRE_ALARM_OFF:
                 _fireAlarmState = false;
-                _mw.WriteMessage("Security alarm is turned off!");
+                _mw.WriteMessage("Fire alarm is turned off!");
                 break;
             default:
                 _mw.WriteMessage("Unexpected message body in Fire alarm controller: " + msgBody);
