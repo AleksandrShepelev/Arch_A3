@@ -10,7 +10,7 @@ abstract public class BaseController extends BaseComponent
     private int _typeOfMessage;
     protected boolean _isSilent = false;
 
-    private static final int HEART_BEAT_DELAY = 7; // send only every X seconds for performance
+    private static final int HEART_BEAT_DELAY = 7; // send only every  seconds for performance
     private long _lastHeartBeat = 0;
 
     protected BaseController(String[] args, int typeOfMessage) {

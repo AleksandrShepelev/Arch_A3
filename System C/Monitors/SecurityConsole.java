@@ -11,6 +11,8 @@ public class SecurityConsole extends BaseConsole {
 
     private static final String ARM = "ON";
     private static final String DISARM = "OFF";
+    private static final String CONFIRM = "Y";
+    private static final String CANCEL = "N";
 
     @Override
     protected void initMonitor(String[] args) {
@@ -27,32 +29,35 @@ public class SecurityConsole extends BaseConsole {
         }
     }
 
-    private void handleSecurityState() {
-        SecurityMonitor monitor = (SecurityMonitor)_monitor;
-        monitor.setArmedState(getNewStateFromUser(monitor.isArmed()));
+    private boolean getNewStateFromUser(boolean isArmed, String option) {
+        String expectedInput;
+        expectedInput = isArmed ? DISARM : ARM ;
+        System.out.println("Enter '" + expectedInput + "' to arm the system");
+
+        if (option.equals(expectedInput)) {
+            return !isArmed;
+        }
+        else {
+            return isArmed;
+        }
     }
 
-    private boolean getNewStateFromUser(Boolean isArmed) {
-        System.out.println("Enter 'OFF' to arm the system");
-
-        String option;
-        String expectedInput;
-        while (true) {
-            expectedInput = isArmed ? ARM : DISARM;
-            System.out.println("Enter '" + expectedInput + "' to arm the system");
-            option = _input.KeyboardReadString();
-
-            if (option.equals(expectedInput)) {
-                return !isArmed;
-            }
-            System.out.println("Unexpected input, expected: " +
-                    expectedInput + ", please try again...");
-        } // while
+    private boolean getSprinklerStateFromUser(String option) {
+        if (option.equals(CONFIRM))
+            return true;
+        else
+            return false;
     }
 
     @Override
     protected void handleUserInput(String option) {
-        handleSecurityState();
+        SecurityMonitor monitor = (SecurityMonitor)_monitor;
+
+        if (option.equals(ARM) || option.equals(DISARM))
+            monitor.setArmedState(getNewStateFromUser(monitor.isArmed(), option));
+
+        if (option.equals(CONFIRM) || option.equals(CANCEL))
+            monitor.setSprinkerState(getSprinklerStateFromUser(option));
     }
 
     @Override

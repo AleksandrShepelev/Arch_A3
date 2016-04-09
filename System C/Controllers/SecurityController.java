@@ -8,7 +8,8 @@ import InstrumentationPackage.Indicator;
 public class SecurityController extends BaseController{
 
     private static final String CONTROLLER_NAME ="Security controller";
-    private boolean _securityAlarmState;
+    private static final String INDICATOR_ALARM_OFF_MSG = "S_ALARM OFF";
+    private static final String INDICATOR_ALARM_ON_MSG = "S_ALARM ON";private boolean _securityAlarmState;
     private Indicator _ai;
     private SecurityController(String[] args) {
         super(args,MessageProtocol.Type.SECURITY_ALARM);
@@ -26,7 +27,7 @@ public class SecurityController extends BaseController{
     protected void messageWindowAfterCreate()
     {
         // Put the status indicators under the panel...
-        _ai = new Indicator("SEC ALARM OFF", _mw.GetX(), _mw.GetY()+_mw.Height());
+        _ai = new Indicator(INDICATOR_ALARM_OFF_MSG, _mw.GetX(), _mw.GetY()+_mw.Height());
     }
 
     @Override
@@ -87,10 +88,10 @@ public class SecurityController extends BaseController{
     {
         if (_securityAlarmState) {
             // Set to green, chiller is on
-            _ai.SetLampColorAndMessage("SEC ALARM ON", 1);
+            _ai.SetLampColorAndMessage(INDICATOR_ALARM_ON_MSG, 1);
         } else {
             // Set to black, chiller is off
-            _ai.SetLampColorAndMessage("SEC ALARM OFF", 0);
+            _ai.SetLampColorAndMessage(INDICATOR_ALARM_OFF_MSG, 0);
         }
     }
 }

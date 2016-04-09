@@ -10,9 +10,6 @@ import MessagePackage.Message;
 import MessagePackage.MessageManagerInterface;
 import MessagePackage.MessageQueue;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 abstract class BaseComponent {
 
     private static final int SLEEP_DELAY = 2500;    // The loop delay (2.5 seconds)
@@ -81,6 +78,7 @@ abstract class BaseComponent {
             }
         } catch (Exception e) {
             System.out.println("Error instantiating message manager interface: " + e);
+            e.printStackTrace();
             _registered = false;
         }
     }
@@ -150,8 +148,8 @@ abstract class BaseComponent {
 
     private void handle() {
         Message msg;                // Message object
-        TimeMessage timeMessage;
         MessageQueue eq;            // Message Queue
+        TimeMessage timeMessage;
         int signCounter = 0;        // Sign counter...i.e. how many times we tried to sign up
 
         boolean done = false;            // Loop termination flag
