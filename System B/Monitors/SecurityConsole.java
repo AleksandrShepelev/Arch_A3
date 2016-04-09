@@ -56,13 +56,17 @@ public class SecurityConsole extends BaseConsole {
         if (option.equals(ARM) || option.equals(DISARM))
             monitor.setArmedState(getNewStateFromUser(monitor.isArmed(), option));
 
-        if (option.equals(CONFIRM))
-            monitor.turnOnTheSprinkler();
-        if (option.equals(CANCEL))
-            monitor.cancelSprinkler();
-        if (option.equals(TURN_OFF))
-            monitor.turnOffTheSprinkler();
+        if (monitor.sprinklerState == SprinklerState.WAIT) {
+            if (option.equals(CONFIRM))
+                monitor.turnOnTheSprinkler();
+            if (option.equals(CANCEL))
+                monitor.cancelSprinkler();
+        }
 
+        if (monitor.sprinklerState == SprinklerState.ON) {
+            if (option.equals(TURN_OFF))
+                monitor.turnOffTheSprinkler();
+        }
     }
 
     @Override

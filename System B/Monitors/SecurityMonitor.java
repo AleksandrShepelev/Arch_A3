@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
+enum SprinklerState {ON, WAIT, OFF };
+
 class SecurityMonitor extends BaseMonitor {
 
     public static final int AGE_LIMIT = 10;
@@ -22,6 +24,7 @@ class SecurityMonitor extends BaseMonitor {
     private boolean _previousFireAlarmState;
     private boolean _isOnFire;
     private boolean _isSprinklerOn;
+    SprinklerState sprinklerState = SprinklerState.OFF;
 
 
     private Timer timer = new Timer("Sprinkler timer");
@@ -85,6 +88,7 @@ class SecurityMonitor extends BaseMonitor {
             if (!_isOnFire) {
                 System.out.println("Fire alarm detected. Enter Y to confirm sprinkler launch or N to cancel. You have "
                         + secToRunSprinkler + "sec to do it");
+                sprinklerState = SprinklerState.WAIT;
                timerTask = new TimerTask() {
                     @Override
                     public void run() {
@@ -233,6 +237,8 @@ class SecurityMonitor extends BaseMonitor {
     }
 
     void turnOnTheSprinkler() {
+        sprinklerState = sprinklerState.ON;
+        System.out.println("Sprinkler is turned on. Enter TO to turn off the sprinkler");
         _isSprinklerOn = true;
         sendSprinklerStateToController();
         timerTask.cancel();
@@ -240,11 +246,13 @@ class SecurityMonitor extends BaseMonitor {
     }
 
     void cancelSprinkler() {
+        sprinklerState = sprinklerState.OFF;
         timerTask.cancel();
         secToRunSprinkler=10;
     }
 
     void turnOffTheSprinkler() {
+        sprinklerState = sprinklerState.OFF;
         _isSprinklerOn = false;
         sendSprinklerStateToController();
     }
