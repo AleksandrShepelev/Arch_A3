@@ -247,12 +247,14 @@ class SecurityMonitor extends BaseMonitor {
 
     void cancelSprinkler() {
         sprinklerState = sprinklerState.OFF;
+        System.out.println("Sprinkler launch is cancelled");
         timerTask.cancel();
         secToRunSprinkler=10;
     }
 
     void turnOffTheSprinkler() {
         sprinklerState = sprinklerState.OFF;
+        System.out.println("Sprinkler is turned off");
         _isSprinklerOn = false;
         sendSprinklerStateToController();
     }
