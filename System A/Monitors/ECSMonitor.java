@@ -15,10 +15,10 @@ class ECSMonitor extends BaseMonitor {
     private Indicator _ti;
     private Indicator _hi;
 
-    private float _tempRangeHigh = 100;            // These parameters signify the temperature and humidity ranges in terms
-    private float _tempRangeLow = 0;                // of high value and low values. The ECSmonitor will attempt to maintain
-    private float _humiRangeHigh = 100;            // this temperature and humidity. Temperatures are in degrees Fahrenheit
-    private float _humiRangeLow = 0;                // and humidity is in relative humidity percentage.
+    private float _tempRangeHigh = 75;            // These parameters signify the temperature and humidity ranges in terms
+    private float _tempRangeLow = 70;                // of high value and low values. The ECSmonitor will attempt to maintain
+    private float _humiRangeHigh = 55;            // this temperature and humidity. Temperatures are in degrees Fahrenheit
+    private float _humiRangeLow = 45;                // and humidity is in relative humidity percentage.
 
     private float _currentTemperature = 0;
     private float _currentHumidity = 0;
