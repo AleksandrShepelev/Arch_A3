@@ -14,7 +14,6 @@ public class SecurityConsole extends BaseConsole {
     private static final String CONFIRM = "Y";
     private static final String CANCEL = "N";
 
-
     @Override
     protected void initMonitor(String[] args) {
         _monitor = new SecurityMonitor(args);
@@ -49,7 +48,6 @@ public class SecurityConsole extends BaseConsole {
         else
             return false;
     }
-
 
     @Override
     protected void handleUserInput(String option) {

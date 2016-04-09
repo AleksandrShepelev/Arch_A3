@@ -57,7 +57,6 @@ class SecurityMonitor extends BaseMonitor {
     protected float getWinPosY() {
         return 0.1f;
     }
-    
 
     @Override
     public void handleMessage(TimeMessage msg) {
@@ -210,7 +209,6 @@ class SecurityMonitor extends BaseMonitor {
 
     }
 
-
     private void sendSprinklerStateToController() {
         String body;
 
@@ -234,7 +232,6 @@ class SecurityMonitor extends BaseMonitor {
         sendMessage(timeMsg);
     }
 
-
     private void sendMessage(TimeMessage timeMsg) {
         try {
             _em.SendMessage(timeMsg.getMessage());
@@ -245,14 +242,12 @@ class SecurityMonitor extends BaseMonitor {
 
     }
 
-
     void setSprinkerState(boolean state) {
         _isSprinklerOn = state;
         sendSprinklerStateToController();
         timerTask.cancel();
         secToRunSprinkler=10;
     }
-
 
     void setArmedState(boolean armed) {
         _armed = armed;
