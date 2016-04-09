@@ -9,8 +9,8 @@ public abstract class EventSensor extends BaseSensor {
     /*
     constants for simulation
      */
-    protected static final float EVENT_PROBABILITY = 0.05f; //probability that door will be opened
-    protected static final float BREAK_DURATION = 4; //if door is broken, we will repeat this message (BREAK_DURATION times + 1).
+    protected static final float EVENT_PROBABILITY = 0.1f; //probability that door will be opened
+    protected static final float BREAK_DURATION = 19; //if door is broken, we will repeat this message (BREAK_DURATION times + 1).
     protected int _currentDuration = 0; //counter for repeated messages (See previous option)
 
 
