@@ -1,6 +1,5 @@
 package Controllers;
 
-import Framework.BaseConsole;
 import Framework.BaseController;
 import Framework.MessageProtocol;
 import Framework.TimeMessage;

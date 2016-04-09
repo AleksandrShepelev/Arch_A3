@@ -8,7 +8,7 @@ import java.awt.*;
 public class MaintenanceIndicator extends JFrame {
 
     private JTable _table;
-    private static final int OFFLINE_CRITICAL_TIMEOUT = 5; // how many seconds is the critical maximum for devices to be offline
+    private static final int OFFLINE_CRITICAL_TIMEOUT = 10; // how many seconds is the critical maximum for devices to be offline
 
     public static final Object columnNames[] = {
         "Device ID",

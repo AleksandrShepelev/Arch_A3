@@ -9,6 +9,8 @@ import MessagePackage.Message;
 
 abstract public class BaseMonitor extends BaseComponent implements Runnable {
 
+    private static final int SLEEP_DELAY = 1000;    // The loop delay (1 second)
+
     protected BaseMonitor(String[] args) {
         super(args);
         _canSign = false; // we don't need additional sign up for monitor
@@ -38,4 +40,8 @@ abstract public class BaseMonitor extends BaseComponent implements Runnable {
         }
     }
 
+    @Override
+    protected int getSleepDelay() {
+        return SLEEP_DELAY;
+    }
 }
