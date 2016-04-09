@@ -41,6 +41,11 @@ public class MaintenanceMonitor extends BaseMonitor {
 
     private MaintenanceMonitor(String[] args) {
         super(args);
+
+        //invite everyone on the startup
+        sendRegisterRequest(MessageProtocol.Body.REG_EVERYONE);
+        System.out.println("Inviting for register everyone...");
+        _regRequestsCounter++;
     }
 
     private void sendRegisterRequest(String messageBody) {
@@ -93,28 +98,33 @@ public class MaintenanceMonitor extends BaseMonitor {
 
     // not all sensors will handle the messages
     protected void handleMessage(TimeMessage msg) {
+        boolean registered = false;
         switch (msg.getMessage().GetMessageId()) {
             case MessageProtocol.Type.REGISTER_DEVICE:
             case MessageProtocol.Type.HEART_BEAT:
-                registerDevice(msg);
+                registered = registerDevice(msg);
                 break;
             default:
                 break;
         }
+
         //check if ID in the database and update the time
         if (_devicesAlive.containsKey(msg.getMessage().GetSenderId())) {
             _devicesAlive.put(msg.getMessage().GetSenderId(), System.currentTimeMillis());
         } else { // is not in the database yet
             //if the message is known in our database but we don't have such device yet - ask him to register
-            checkIfRegistered(msg);
+            if (!registered) {
+                System.out.println("Checking registration for: " + msg.GetMessageId());
+                checkIfRegistered(msg);
+            }
         }
     }
 
-    private void registerDevice(TimeMessage msg) {
+    private boolean registerDevice(TimeMessage msg) {
 
-        //if not in the list yet - register it!
+        //if in the list already - skip it!
         if (_devices.containsKey(msg.getMessage().GetSenderId())) {
-            return;
+            return true;
         }
 
         String messageBody = msg.getMessageText();
@@ -122,14 +132,16 @@ public class MaintenanceMonitor extends BaseMonitor {
         String deviceType = parts[0];
 
         try {
-            TimeMessage ackMessage = new TimeMessage(MessageProtocol.Type.ACKNOWLEDGEMENT, deviceType);
+            TimeMessage ackMessage = new TimeMessage(MessageProtocol.Type.REGISTER_ACKNOWLEDGEMENT, deviceType);
             _em.SendMessage(ackMessage.getMessage());
             _devices.put(msg.getMessage().GetSenderId(), msg.getMessageText());
             _devicesAlive.put(msg.getMessage().GetSenderId(), System.currentTimeMillis());
             _mw.WriteMessage("Registered new device: " + msg.getMessageText());
+            return true;
         } catch (Exception e) {
             _mw.WriteMessage("An error occurred during device register:: " + e);
             e.printStackTrace();
+            return false;
         }
     }
 
@@ -144,7 +156,6 @@ public class MaintenanceMonitor extends BaseMonitor {
             String value = entry.getValue();
             long diff = System.currentTimeMillis() - _devicesAlive.get(key);
             float seconds = diff / 1000f;
-            _mw.WriteMessage("The device " + value + " was alive " + seconds + " seconds ago");
             String[] parts = value.split(TimeMessage.BODY_DELIMETER);
             row[0] = String.valueOf(key); // ID
             row[1] = parts[0]; // name
@@ -157,8 +168,6 @@ public class MaintenanceMonitor extends BaseMonitor {
             rows.add(row);
         }
 
-        _mi.setRows(rows);
-
         // if we are empty somehow and retry count is not fulfilled then register anyone
         // it is a possible situation if the console was after the sensor was already working
         if (_regRequestsCounter < RETRY_COUNT && _devices.size() < 1) {
@@ -166,11 +175,13 @@ public class MaintenanceMonitor extends BaseMonitor {
             sendRegisterRequest(MessageProtocol.Body.REG_EVERYONE);
             _regRequestsCounter++;
         }
+
+        _mi.setRows(rows);
     }
 
-    protected void checkIfRegistered(TimeMessage msg) {
+    private void checkIfRegistered(TimeMessage msg) {
         // if no devices at all skip for now because ALL REGISTER will work
-        if (_devices.size() < 1 || _regRequestsCounter < 1) {
+        if (_devices.size() < 1) {
             return;
         }
 
@@ -178,6 +189,9 @@ public class MaintenanceMonitor extends BaseMonitor {
         if (!devicesByMessages.containsKey(msg.getMessage().GetMessageId())) {
             return;
         }
+
+        _mw.WriteMessage("Sending register request for: " + devicesByMessages.get(msg.getMessage().GetMessageId()));
+        _regRequestsCounter++;
 
         // ask him to register
         sendRegisterRequest(devicesByMessages.get(msg.getMessage().GetMessageId()));

@@ -25,6 +25,7 @@ public class MessageProtocol
         public static final int REGISTER_DEVICE = 10; // register the device on connect to the maintenance console
         public static final int REGISTER_DEVICE_REQUEST = 50; // register the device request from maintenance console
         public static final int ACKNOWLEDGEMENT = 30; // send the acknowledgement message for command receive
+        public static final int REGISTER_ACKNOWLEDGEMENT = 40; // send the acknowledgement for registering
 
         public static final int WINDOW = 11; //
         public static final int DOOR = 12; //
