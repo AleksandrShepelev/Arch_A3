@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
+enum SprinklerState {ON, WAIT, OFF };
+
 class SecurityMonitor extends BaseMonitor {
 
     public static final int AGE_LIMIT = 10;
@@ -22,6 +24,8 @@ class SecurityMonitor extends BaseMonitor {
     private boolean _previousFireAlarmState;
     private boolean _isOnFire;
     private boolean _isSprinklerOn;
+    SprinklerState sprinklerState = SprinklerState.OFF;
+
 
     private Timer timer = new Timer("Sprinkler timer");
     TimerTask timerTask;
@@ -84,6 +88,7 @@ class SecurityMonitor extends BaseMonitor {
             if (!_isOnFire) {
                 System.out.println("Fire alarm detected. Enter Y to confirm sprinkler launch or N to cancel. You have "
                         + secToRunSprinkler + "sec to do it");
+                sprinklerState = SprinklerState.WAIT;
                timerTask = new TimerTask() {
                     @Override
                     public void run() {
@@ -92,10 +97,9 @@ class SecurityMonitor extends BaseMonitor {
                 };
                 timer.scheduleAtFixedRate(timerTask, 50, 1000);//start timer in 0ms to increment  counter
             }
-
             if (secToRunSprinkler <= 0)
             {
-                setSprinkerState(true);
+                turnOnTheSprinkler();
             }
             _isOnFire = true;
         }else if(msg.getMessageText().equalsIgnoreCase(MessageProtocol.Body.NO_FIRE)) {
@@ -219,16 +223,6 @@ class SecurityMonitor extends BaseMonitor {
                 : MessageProtocol.Body.SPRINKLER_OFF;
 
         TimeMessage timeMsg = new TimeMessage(MessageProtocol.Type.SPRINKLER, body);
-
-      /*  String displayMsg = !_armed
-                ? "DISARMED"
-                : isSecured
-                ? "NO ALARM"
-                : "ALARM";
-        int color = isAlarming ? 3 : 0;
-
-        _ai.SetLampColorAndMessage(displayMsg, color);*/
-
         sendMessage(timeMsg);
     }
 
@@ -242,12 +236,27 @@ class SecurityMonitor extends BaseMonitor {
 
     }
 
-    void setSprinkerState(boolean state) {
-        _isSprinklerOn = state;
+    void turnOnTheSprinkler() {
+        sprinklerState = sprinklerState.ON;
+        System.out.println("Sprinkler is turned on. Enter TO to turn off the sprinkler");
+        _isSprinklerOn = true;
         sendSprinklerStateToController();
         timerTask.cancel();
         secToRunSprinkler=10;
     }
+
+    void cancelSprinkler() {
+        sprinklerState = sprinklerState.OFF;
+        timerTask.cancel();
+        secToRunSprinkler=10;
+    }
+
+    void turnOffTheSprinkler() {
+        sprinklerState = sprinklerState.OFF;
+        _isSprinklerOn = false;
+        sendSprinklerStateToController();
+    }
+
 
     void setArmedState(boolean armed) {
         _armed = armed;
