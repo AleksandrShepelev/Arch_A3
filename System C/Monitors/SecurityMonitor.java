@@ -59,6 +59,8 @@ class SecurityMonitor extends BaseMonitor {
         _secAlarmIndicator.dispose();
         _fireAlarmIndicator.dispose();
         _sprinklerAlarmIndicator.dispose();
+        timer.cancel();
+        timer.purge();
     }
 
     @Override
@@ -208,6 +210,7 @@ class SecurityMonitor extends BaseMonitor {
         sendMessage(timeMsg);
 
     }
+
 
     private void sendSprinklerStateToController() {
         String body;
