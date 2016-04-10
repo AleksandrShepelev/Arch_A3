@@ -122,26 +122,28 @@ abstract class BaseComponent
                 eq = _em.GetMessageQueue();
 
                 // If there are messages in the queue, we read through them.
-                int qLen = eq.GetSize();
+                // the message queue might be null by the way somehow (message bus problems?)
+                if (eq != null) {
+                    int qLen = eq.GetSize();
 
-                for ( int i = 0; i < qLen; i++ ) {
+                    for ( int i = 0; i < qLen; i++ ) {
 
-                    msg = eq.GetMessage();
-                    timeMessage = new TimeMessage(msg);
+                        msg = eq.GetMessage();
+                        timeMessage = new TimeMessage(msg);
 
-                    handleMessage(timeMessage);
+                        handleMessage(timeMessage);
 
-                    // If the message ID == 99 then this is a signal that the simulation
-                    // is to end. At this point, the loop termination flag is set to
-                    // true and this process unregisters from the message manager.
+                        // If the message ID == 99 then this is a signal that the simulation
+                        // is to end. At this point, the loop termination flag is set to
+                        // true and this process unregisters from the message manager.
 
-                    if (timeMessage.GetMessageId() == MessageProtocol.Type.TERMINATE ) {
-                        done = true;
-                        _em.UnRegister();
-                        _mw.WriteMessage("\n\nSimulation Stopped. \n");
-                        unload();
+                        if (timeMessage.GetMessageId() == MessageProtocol.Type.TERMINATE ) {
+                            done = true;
+                            _em.UnRegister();
+                            _mw.WriteMessage("\n\nSimulation Stopped. \n");
+                            unload();
+                        }
                     }
-
                 }
 
                 afterHandle();

@@ -182,40 +182,41 @@ abstract class BaseComponent {
                 // Get the message queue
                 eq = _em.GetMessageQueue();
 
-                // If there are messages in the queue, we read through them.
-                int qLen = eq.GetSize();
+                if (eq != null) {
+                    // If there are messages in the queue, we read through them.
+                    int qLen = eq.GetSize();
 
-                for (int i = 0; i < qLen; i++) {
+                    for (int i = 0; i < qLen; i++) {
 
-                    msg = eq.GetMessage();
+                        msg = eq.GetMessage();
 
-                    timeMessage = new TimeMessage(msg);
+                        timeMessage = new TimeMessage(msg);
 
-                    // check if the device is signed up
-                    if (canSign() && !isSigned() && signCounter < getRetryCount()) {
-                        checkSignUp(timeMessage);
+                        // check if the device is signed up
+                        if (canSign() && !isSigned() && signCounter < getRetryCount()) {
+                            checkSignUp(timeMessage);
+                        }
+
+                        // check if there is a register request from the monitor
+                        // reset the counter as well
+                        if (canSign() && checkSignUpRequest(timeMessage)) {
+                            signCounter = 0;
+                        }
+
+                        // handle other messages
+                        handleMessage(timeMessage);
+
+                        // If the message ID == 99 then this is a signal that the simulation
+                        // is to end. At this point, the loop termination flag is set to
+                        // true and this process unregisters from the message manager.
+
+                        if (msg.GetMessageId() == MessageProtocol.Type.TERMINATE) {
+                            done = true;
+                            _em.UnRegister();
+                            _mw.WriteMessage("\n\nSimulation Stopped. \n");
+                            unload();
+                        }
                     }
-
-                    // check if there is a register request from the monitor
-                    // reset the counter as well
-                    if (canSign() && checkSignUpRequest(timeMessage)) {
-                        signCounter = 0;
-                    }
-
-                    // handle other messages
-                    handleMessage(timeMessage);
-
-                    // If the message ID == 99 then this is a signal that the simulation
-                    // is to end. At this point, the loop termination flag is set to
-                    // true and this process unregisters from the message manager.
-
-                    if (msg.GetMessageId() == MessageProtocol.Type.TERMINATE) {
-                        done = true;
-                        _em.UnRegister();
-                        _mw.WriteMessage("\n\nSimulation Stopped. \n");
-                        unload();
-                    }
-
                 }
 
                 afterHandle();
