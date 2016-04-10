@@ -217,6 +217,8 @@ abstract class BaseComponent {
                             unload();
                         }
                     }
+                } else {
+                    _mw.WriteMessage("No queue for me :(");
                 }
 
                 afterHandle();
