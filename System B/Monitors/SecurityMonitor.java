@@ -12,6 +12,16 @@ enum SprinklerState {ON, WAIT, OFF}
 
 class SecurityMonitor extends BaseMonitor {
 
+    private static final String DISARMED = "DISARMED";
+    private static final String NO_ALARM = "NO SEC ALARM";
+    private static final String ALARM = "SEC ALARM";
+
+    private static final String NO_FIRE_ALARM = "NO FIRE ALARM";
+    private static final String FIRE_ALARM = "FIRE ALARM";
+
+    private static final String SPRINKLER_ON = "SPRINKLER ON";
+    private static final String SPRINKLER_OFF = "SPRINKLER OFF";
+
     private Indicator _secAlarmIndicator;
     private Indicator _fireAlarmIndicator;
     private Indicator _sprinklerAlarmIndicator;
@@ -28,19 +38,20 @@ class SecurityMonitor extends BaseMonitor {
 
 
     private Timer timer = new Timer("Sprinkler timer");
-    TimerTask timerTask;
+    private TimerTask timerTask;
     private int secToRunSprinkler = 10;
 
 
     SecurityMonitor(String[] args) {
         super(args);
+        _previousSecurityAlarmState = NO_ALARM;
     }
 
     @Override
     protected void messageWindowAfterCreate() {
-        _secAlarmIndicator = new Indicator("NO SEC ALARM", _mw.GetX(), _mw.Width(), 0);
-        _fireAlarmIndicator = new Indicator("NO FIRE ALARM", _mw.GetX(), _mw.Width(), 0);
-        _sprinklerAlarmIndicator = new Indicator("SPRINKLER OFF", _mw.GetX(), _mw.Width(), 0);
+        _secAlarmIndicator = new Indicator(NO_ALARM,  _mw.GetX() + _mw.Width(), 0);
+        _fireAlarmIndicator = new Indicator(NO_FIRE_ALARM, _mw.GetX() + _mw.Width(), _mw.Height() / 2, 0);
+        _sprinklerAlarmIndicator = new Indicator(SPRINKLER_OFF, _mw.GetX() + _mw.Width(), _mw.Height(), 0);
     }
 
     @Override
@@ -160,9 +171,9 @@ class SecurityMonitor extends BaseMonitor {
                         : MessageProtocol.Body.FIRE_ALARM_OFF;
 
         if(_isOnFire) {
-            _fireAlarmIndicator.SetLampColorAndMessage("FIRE ALARM", 3);
+            _fireAlarmIndicator.SetLampColorAndMessage(FIRE_ALARM, 3);
         }else {
-            _fireAlarmIndicator.SetLampColorAndMessage("NO FIRE ALARM", 0);
+            _fireAlarmIndicator.SetLampColorAndMessage(NO_FIRE_ALARM, 0);
         }
         sendMessage(new TimeMessage(MessageProtocol.Type.FIRE_ALARM, body));
     }
@@ -172,7 +183,15 @@ class SecurityMonitor extends BaseMonitor {
         boolean isSafetyEnsured = !_isWindowBroken && !_isDoorBroken && !_isMotionDetected;
         boolean isAlarming = _armed && !isSafetyEnsured;
 
-        _mw.WriteMessage(isAlarming ? "Turning on the alarm" : "Turning off the alarm");
+        String displayMsg = !_armed
+                ? DISARMED
+                : isSafetyEnsured
+                ? NO_ALARM
+                : ALARM;
+        int color = isAlarming ? 3 : 0;
+        if(displayMsg.equalsIgnoreCase(_previousSecurityAlarmState)){
+            return;
+        }
 
         body = isAlarming
                 ? MessageProtocol.Body.SECURITY_ALARM_ON
@@ -180,15 +199,7 @@ class SecurityMonitor extends BaseMonitor {
 
         TimeMessage timeMsg = new TimeMessage(MessageProtocol.Type.SECURITY_ALARM, body);
 
-        String displayMsg = !_armed
-                                ? "DISARMED"
-                                : isSafetyEnsured
-                                    ? "NO SEC ALARM"
-                                    : "SEC ALARM";
-        int color = isAlarming ? 3 : 0;
-        if(displayMsg.equalsIgnoreCase(_previousSecurityAlarmState)){
-            return;
-        }
+
         _previousSecurityAlarmState = displayMsg;
 
         _secAlarmIndicator.SetLampColorAndMessage(displayMsg, color);
@@ -197,6 +208,7 @@ class SecurityMonitor extends BaseMonitor {
         sendMessage(timeMsg);
 
     }
+
 
     private void sendSprinklerStateToController() {
         String body;
@@ -209,9 +221,9 @@ class SecurityMonitor extends BaseMonitor {
 
         TimeMessage timeMsg = new TimeMessage(MessageProtocol.Type.SPRINKLER, body);
         if(_isSprinklerOn) {
-            _sprinklerAlarmIndicator.SetLampColorAndMessage("SPRINKLER ON", 1);
+            _sprinklerAlarmIndicator.SetLampColorAndMessage(SPRINKLER_ON, 1);
         }else {
-            _sprinklerAlarmIndicator.SetLampColorAndMessage("SPRINKLER OFF", 0);
+            _sprinklerAlarmIndicator.SetLampColorAndMessage(SPRINKLER_OFF, 0);
         }
         sendMessage(timeMsg);
     }

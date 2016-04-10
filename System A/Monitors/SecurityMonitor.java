@@ -12,6 +12,11 @@ import InstrumentationPackage.Indicator;
 
 class SecurityMonitor extends BaseMonitor {
 
+    private static final String DISARMED = "DISARMED";
+    private static final String NO_ALARM = "NO SEC ALARM";
+    private static final String ALARM = "SEC ALARM";
+
+
     private Indicator _secAlarmIndicator;
     private boolean _armed = true;
     private boolean _isWindowBroken;
@@ -20,14 +25,15 @@ class SecurityMonitor extends BaseMonitor {
     private String _previousSecurityAlarmState;
 
 
-
     SecurityMonitor(String[] args) {
         super(args);
+        _previousSecurityAlarmState = NO_ALARM;
+
     }
 
     @Override
     protected void messageWindowAfterCreate() {
-        _secAlarmIndicator = new Indicator("NO SEC ALARM", _mw.GetX(), _mw.Width(), 0);
+        _secAlarmIndicator = new Indicator(NO_ALARM,  _mw.GetX() + _mw.Width(), 0);
     }
 
     @Override
@@ -107,7 +113,15 @@ class SecurityMonitor extends BaseMonitor {
         boolean isSafetyEnsured = !_isWindowBroken && !_isDoorBroken && !_isMotionDetected;
         boolean isAlarming = _armed && !isSafetyEnsured;
 
-        _mw.WriteMessage(isAlarming ? "Turning on the alarm" : "Turning off the alarm");
+        String displayMsg = !_armed
+                ? DISARMED
+                : isSafetyEnsured
+                ? NO_ALARM
+                : ALARM;
+        int color = isAlarming ? 3 : 0;
+        if(displayMsg.equalsIgnoreCase(_previousSecurityAlarmState)){
+            return;
+        }
 
         body = isAlarming
                 ? MessageProtocol.Body.SECURITY_ALARM_ON
@@ -115,15 +129,7 @@ class SecurityMonitor extends BaseMonitor {
 
         TimeMessage timeMsg = new TimeMessage(MessageProtocol.Type.SECURITY_ALARM, body);
 
-        String displayMsg = !_armed
-                                ? "DISARMED"
-                                : isSafetyEnsured
-                                    ? "NO SEC ALARM"
-                                    : "SEC ALARM";
-        int color = isAlarming ? 3 : 0;
-        if(displayMsg.equalsIgnoreCase(_previousSecurityAlarmState)){
-            return;
-        }
+
         _previousSecurityAlarmState = displayMsg;
 
         _secAlarmIndicator.SetLampColorAndMessage(displayMsg, color);
