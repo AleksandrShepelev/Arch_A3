@@ -211,7 +211,6 @@ class SecurityMonitor extends BaseMonitor {
 
     }
 
-
     private void sendSprinklerStateToController() {
         String body;
 
