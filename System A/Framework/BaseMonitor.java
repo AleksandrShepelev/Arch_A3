@@ -18,16 +18,10 @@ abstract public class BaseMonitor extends BaseComponent implements Runnable {
 
     protected BaseMonitor(String[] args) {
         super(args);
-        _canSign = false; // we don't need additional sign up for monitor
     }
 
     public void run() {
         execute();
-    }
-
-    @Override
-    protected String getType() {
-        return "MONITOR";
     }
 
     void halt() {
