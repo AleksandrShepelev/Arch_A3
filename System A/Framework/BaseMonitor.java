@@ -8,19 +8,26 @@ package Framework;
 import MessagePackage.Message;
 
 import java.util.HashMap;
+import java.util.Map;
 
 abstract public class BaseMonitor extends BaseComponent implements Runnable {
 
     private static final int SLEEP_DELAY = 1000;    // The loop delay (1 second)
-    private HashMap<Long, StoredMessage> _messageStorage = new HashMap<>();
-    public static final int AGE_LIMIT = 10;
+    private Map<Long, StoredMessage> _messageStorage = new HashMap<>();
+    private static final int AGE_LIMIT = 10; // max age for each stored message with acknowledgement
 
     protected BaseMonitor(String[] args) {
         super(args);
+        _canSign = false; // we don't need additional sign up for monitor
     }
 
     public void run() {
         execute();
+    }
+
+    @Override
+    protected String getType() {
+        return "MONITOR";
     }
 
     void halt() {
@@ -40,9 +47,8 @@ abstract public class BaseMonitor extends BaseComponent implements Runnable {
     }
 
     @Override
-    protected void handleMessage(TimeMessage msg)
-    {
-        if(msg.GetMessageId() == MessageProtocol.Type.ACKNOWLEDGEMENT) {
+    protected void handleMessage(TimeMessage msg) {
+        if (msg.GetMessageId() == MessageProtocol.Type.ACKNOWLEDGEMENT) {
             handleAcknowledgement(msg);
         }
     }
@@ -53,15 +59,14 @@ abstract public class BaseMonitor extends BaseComponent implements Runnable {
     }
 
     @Override
-    protected void afterHandle()
-    {
+    protected void afterHandle() {
         resendNotDeliveredMessages();
     }
 
     private void resendNotDeliveredMessages() {
         _messageStorage.forEach((aLong, storedMessage) -> storedMessage.incAge()); //incrementing age
 
-        HashMap<Long, StoredMessage> clonedObj = (HashMap<Long, StoredMessage>) _messageStorage.clone();
+        Map<Long, StoredMessage> clonedObj = new HashMap<>(_messageStorage);//HashMap<Long, StoredMessage>) _messageStorage.clone();
 
         _messageStorage.forEach((key, message) -> {
             if (message.Age > AGE_LIMIT) {
@@ -74,10 +79,8 @@ abstract public class BaseMonitor extends BaseComponent implements Runnable {
         _messageStorage = clonedObj;
     }
 
-    protected void putInStorage(Long key, Message msg)
-    {
+    private void putInStorage(Long key, Message msg) {
         _messageStorage.put(key, new StoredMessage(msg));
-
     }
 
     protected void sendMessage(TimeMessage timeMsg) {
@@ -94,5 +97,4 @@ abstract public class BaseMonitor extends BaseComponent implements Runnable {
     protected int getSleepDelay() {
         return SLEEP_DELAY;
     }
-
 }

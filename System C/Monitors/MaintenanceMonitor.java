@@ -114,7 +114,6 @@ public class MaintenanceMonitor extends BaseMonitor {
         } else { // is not in the database yet
             //if the message is known in our database but we don't have such device yet - ask him to register
             if (!registered) {
-                System.out.println("Checking registration for: " + msg.GetMessageId());
                 checkIfRegistered(msg);
             }
         }
@@ -145,8 +144,7 @@ public class MaintenanceMonitor extends BaseMonitor {
         }
     }
 
-    @Override
-    protected void afterHandle() {
+    private void updateTable() {
 
         List<String[]> rows = new ArrayList<>();
 
@@ -167,7 +165,10 @@ public class MaintenanceMonitor extends BaseMonitor {
             row[3] = String.valueOf(seconds); // Last seconds was online
             rows.add(row);
         }
+        _mi.setRows(rows);
+    }
 
+    private void checkIfAnyRegistered() {
         // if we are empty somehow and retry count is not fulfilled then register anyone
         // it is a possible situation if the console was after the sensor was already working
         if (_regRequestsCounter < RETRY_COUNT && _devices.size() < 1) {
@@ -175,8 +176,12 @@ public class MaintenanceMonitor extends BaseMonitor {
             sendRegisterRequest(MessageProtocol.Body.REG_EVERYONE);
             _regRequestsCounter++;
         }
+    }
 
-        _mi.setRows(rows);
+    @Override
+    protected void afterHandle() {
+        updateTable();
+        checkIfAnyRegistered();
     }
 
     private void checkIfRegistered(TimeMessage msg) {
@@ -191,7 +196,6 @@ public class MaintenanceMonitor extends BaseMonitor {
         }
 
         _mw.WriteMessage("Sending register request for: " + devicesByMessages.get(msg.getMessage().GetMessageId()));
-        _regRequestsCounter++;
 
         // ask him to register
         sendRegisterRequest(devicesByMessages.get(msg.getMessage().GetMessageId()));

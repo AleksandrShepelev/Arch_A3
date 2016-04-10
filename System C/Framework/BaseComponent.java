@@ -13,11 +13,15 @@ import MessagePackage.MessageQueue;
 abstract class BaseComponent {
 
     private static final int SLEEP_DELAY = 2500;    // The loop delay (2.5 seconds)
-    public static final int RETRY_COUNT = 10;       // Number of retries for acknowledged delivery
+    protected static final int RETRY_COUNT = 10;       // Number of retries for acknowledged delivery
 
     private boolean _registered = true;             // Signifies that this class is registered with an message manager.
     private boolean _signed = false;                // Signifies that this class is registered in the maintenance monitor
     boolean _canSign = true;                        // Sets if the component can register or not in the monitor
+
+    // make registration not so often for performance reasons
+    private long _lastRegisterRequest = System.currentTimeMillis();
+    private static final int SIGN_UP_DELAY = 5000; // delay between register requests
 
     protected MessageManagerInterface _em = null;   // Interface object to the message manager
     protected MessageWindow _mw = null;
@@ -102,7 +106,7 @@ abstract class BaseComponent {
         messageWindowAfterCreate();
     }
 
-    protected String getRegistrationMessage() {
+    String getRegistrationMessage() {
         return getType() + TimeMessage.BODY_DELIMETER + getName();
     }
 
@@ -164,9 +168,12 @@ abstract class BaseComponent {
             try {
 
                 // try sign up in the maintenance monitor
-                if (canSign() && !isSigned() && signCounter < getRetryCount()) {
+                if (canSign() && !isSigned()
+                        && signCounter < getRetryCount()
+                        && (System.currentTimeMillis() - _lastRegisterRequest) >= SIGN_UP_DELAY) {
                     signUp();
                     signCounter++;
+                    _lastRegisterRequest = System.currentTimeMillis();
                 }
 
                 // Post the current measurement

@@ -28,7 +28,7 @@ class SecurityMonitor extends BaseMonitor {
 
 
     private Timer timer = new Timer("Sprinkler timer");
-    TimerTask timerTask;
+    private TimerTask timerTask;
     private int secToRunSprinkler = 10;
 
 
